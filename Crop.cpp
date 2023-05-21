@@ -790,7 +790,7 @@ void Harvest::SellAndGenerateRevenue()
 	double wheatRevenue = amountWheat * Wheat::price;
 	double riceRevenue = amountRice * Rice::price;
 	// Sum the revenues
-	revenue = cornRevenue + wheatRevenue + riceRevenue;
+	revenue += cornRevenue + wheatRevenue + riceRevenue;
 	// Reset the harvested amounts to zero
 	amountCorn = 0;
 	amountWheat = 0;

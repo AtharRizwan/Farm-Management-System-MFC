@@ -9,10 +9,11 @@ class CropsDlg : public CDialog
 	CBrush m_backgroundBrush;
 	virtual BOOL OnInitDialog();
 	DECLARE_DYNAMIC(CropsDlg)
-
+	
 public:
 	CropsDlg(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CropsDlg();
+	void saveData();
 
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 // Dialog Data
