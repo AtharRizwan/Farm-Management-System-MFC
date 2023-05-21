@@ -1,8 +1,8 @@
 /* Header file for Crop class and its subclasses and Harvest class*/
-using namespace std;
-
 #ifndef CROP_H
 #define CROP_H
+
+#include <string>
 
 // Crop Class
 class Crop
@@ -11,34 +11,34 @@ class Crop
 	friend class Harvest;
 	// Private data members
 protected:
-	string name;
+	std::string name;
 	int fieldSize;	// in acres
 	static double quantity;	// in tonnes
 	static double price;	// in Rs. per tonne
-	string plantingDate;
-	string harvestingDate;
-	string growthStatus;
+	std::string plantingDate;
+	std::string harvestingDate;
+	std::string growthStatus;
 	// Public member functions
 public:
 	// Constructor
 	Crop();
 
 	// Setter functions
-	void setName(string name);
+	void setName(std::string name);
 	static void setQuantity(double quantity);
 	static void setPrice(double price);
-	void setPlantingDate(string plantingDate);
-	void setHarvestingDate(string harvestingDate);
+	void setPlantingDate(std::string plantingDate);
+	void setHarvestingDate(std::string harvestingDate);
 	void setFieldSize(int fieldSize);
 
 	// Getter Functions
-	string getName() const; 
+	std::string getName() const; 
 	double getQuantity() const;
 	double getPrice() const;
-	string getPlantingDate() const;
-	string getHarvestingDate() const;
+	std::string getPlantingDate() const;
+	std::string getHarvestingDate() const;
 	int getFieldSize() const;
-	string getGrowthStatus() const;
+	std::string getGrowthStatus() const;
 
 
 	// Function to advance the growth status
@@ -64,16 +64,16 @@ public:
 	virtual double calculateYield() const = 0;
 
 	// record any pest infestations
-	void recordPestInfestation(string date, string description);
+	void recordPestInfestation(std::string date, std::string description);
 
 	// record any disease outbreaks
-	void recordDiseaseOutbreak(string date, string description);
+	void recordDiseaseOutbreak(std::string date, std::string description);
 
 	// Water crop and record it
-	void recordCropWatering(string date, double water);
+	void recordCropWatering(std::string date, double water);
 
 	// Function to fertilize crop and record it
-	void recordFertilization(string date, double fertilizer);
+	void recordFertilization(std::string date, double fertilizer);
 
 	// Function to reset the Crop for new season
 	void virtual startNewSeason();
@@ -83,7 +83,7 @@ public:
 // Derived class wheat
 class Wheat : public Crop 
 {
-	string wheatType;
+	std::string wheatType;
 	int headsPerYard;
 	double headWeight;	// in grams
 public:
@@ -91,12 +91,12 @@ public:
 	Wheat();
 
 	// setter functions
-	void setWheatType(string wheatType);
+	void setWheatType(std::string wheatType);
 	void setHeadsPerYard(int headsPerYard);
 	void setHeadWeight(double headWeight);
 
 	// Getter functions
-	string getWheatType() const;
+	std::string getWheatType() const;
 	int getHeadsPerYard() const;
 	double getHeadWeight() const;
 
@@ -114,7 +114,7 @@ public:
 // Derived class Corn
 class Corn : public Crop
 {	
-	string cornType;
+	std::string cornType;
 	int earsPerAcre;
 	int kernalsPerEar;
 	double earWeight;	//in grams
@@ -124,14 +124,14 @@ public:
 	Corn();
 
 	// Setter functions
-	void setCornType(string cornType);
+	void setCornType(std::string cornType);
 	void setEarsPerAcre(int earsPerAcre);
 	void setKernalsPerEar(int kernalsPerEar);
 	void setEarWeight(double earWeight);
 	void setShrinkage(int shrikage);
 
 	// Getter functions
-	string getCornType() const;
+	std::string getCornType() const;
 	int getEarsPerAcre() const;
 	int getKernalsPerEar() const;
 	double getEarWeight() const;
@@ -151,7 +151,7 @@ public:
 // Derived class Rice
 class Rice : public Crop
 {
-	string riceType;
+	std::string riceType;
 	int numPaniclesPerM2;
 	int grainsPerPanicle;
 	double grainWeight;	//in grams
@@ -161,13 +161,13 @@ public:
 	Rice();
 
 	// setter functions
-	void setRiceType(string riceType);
+	void setRiceType(std::string riceType);
 	void setNumPaniclesPerM2(int numPaniclesPerM2);
 	void setGrainsPerPanicle(int grainsPerPanicle);
 	void setGrainWeight(double grainWeight);
 
 	// Getter functions
-	string setRiceType() const;
+	std::string setRiceType() const;
 	int setNumPaniclesPerM2() const;
 	int setGrainsPerPanicle() const;
 	double setGrainWeight() const;
