@@ -9,9 +9,6 @@
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG1                     130
 #define IDD_DIALOG2                     132
-#define IDD_DIALOG3                     134
-#define IDD_DIALOG4                     136
-#define IDD_DIALOG5                     138
 #define txtUsername                     1000
 #define txtPassword                     1001
 #define btnLogin                        1002

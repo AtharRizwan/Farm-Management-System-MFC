@@ -42,15 +42,6 @@
     <ClInclude Include="CropsDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AnimalsDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmployeesDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MedicineDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Farm Management System MFC.cpp">
@@ -69,15 +60,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CropsDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimalsDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EmployeesDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MedicineDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
