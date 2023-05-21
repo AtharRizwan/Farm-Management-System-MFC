@@ -206,7 +206,12 @@ public:
 	static void setWater(double amount);
 	void setPriceFertilizer(double price);
 	void setPriceWater(double price);
+	void setAmountRice(double value);
+	void setAmountWheat(double value);
+	void setAmountCorn(double value);
+	void setRevenue(double value);
 
+	// Getter functions
 	static double getFertilizer();
 	static double getWater();
 	double getPriceFertilizer() const;

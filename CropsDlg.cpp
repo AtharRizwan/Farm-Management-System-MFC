@@ -56,6 +56,9 @@ BEGIN_MESSAGE_MAP(CropsDlg, CDialog)
 	ON_BN_CLICKED(btnAdvanceStatusRice, &CropsDlg::OnBnClickedbtnadvancestatusrice)
 	ON_NOTIFY(DTN_DATETIMECHANGE, dtpRicePlanting, &CropsDlg::OnDtnDatetimechangedtpriceplanting)
 	ON_NOTIFY(DTN_DATETIMECHANGE, dtpRiceHarvesting, &CropsDlg::OnDtnDatetimechangedtpriceharvesting)
+	ON_BN_CLICKED(txtHarvestAndStore, &CropsDlg::OnBnClickedtxtharvestandstore)
+	ON_BN_CLICKED(txtSellAndGenerateRevenue, &CropsDlg::OnBnClickedtxtsellandgeneraterevenue)
+	ON_BN_CLICKED(txtStartNewSeason, &CropsDlg::OnBnClickedtxtstartnewseason)
 END_MESSAGE_MAP()
 
 
@@ -70,74 +73,91 @@ BOOL CropsDlg::OnInitDialog()
 
 	// Perform your desired task here
 	// Wheat load data
-		output = wheat.getWheatType().c_str();
-		SetDlgItemText(txtWheatType, output);
-		output = to_string(wheat.getFieldSize()).c_str();
-		SetDlgItemText(txtWheatFieldSize, output);
-		output = to_string(wheat.getQuantity()).c_str();
-		SetDlgItemText(txtWheatQuantity, output);
-		output = to_string(wheat.getPrice()).c_str();
-		SetDlgItemText(txtWheatPrice, output);
-		output = wheat.getGrowthStatus().c_str();
-		SetDlgItemText(txtWheatStatus, output);
-		output = wheat.getPlantingDate().c_str();
-		SetDlgItemText(txtWheatPDate, output);
-		output = wheat.getHarvestingDate().c_str();
-		SetDlgItemText(txtWheatHDate, output);
-		output = to_string(wheat.getHeadWeight()).c_str();
-		SetDlgItemText(txtHeadWeight, output);
-		output = to_string(wheat.getHeadsPerYard()).c_str();
-		SetDlgItemText(txtHeadsYard, output);
-		output = to_string(wheat.calculateYield()).c_str();
-		SetDlgItemText(txtYieldWheat, output);
-		// Corn load data
-		output = corn.getCornType().c_str();
-		SetDlgItemText(txtCornType, output);
-		output = to_string(corn.getFieldSize()).c_str();
-		SetDlgItemText(txtCornFieldSize, output);
-		output = to_string(corn.getQuantity()).c_str();
-		SetDlgItemText(txtCornQuantity, output);
-		output = to_string(corn.getPrice()).c_str();
-		SetDlgItemText(txtCornPrice, output);
-		output = corn.getGrowthStatus().c_str();
-		SetDlgItemText(txtCornStatus, output);
-		output = corn.getPlantingDate().c_str();
-		SetDlgItemText(txtCornPDate, output);
-		output = corn.getHarvestingDate().c_str();
-		SetDlgItemText(txtCornHDate, output);
-		output = to_string(corn.getEarWeight()).c_str();
-		SetDlgItemText(txtEarWeight, output);
-		output = to_string(corn.getKernalsPerEar()).c_str();
-		SetDlgItemText(txtKernalsEar, output);
-		output = to_string(corn.getEarsPerAcre()).c_str();
-		SetDlgItemText(txtEarsAcre, output);
-		output = to_string(corn.getShrinkage()).c_str();
-		SetDlgItemText(txtShrinkage, output);
-		output = to_string(corn.calculateYield()).c_str();
-		SetDlgItemText(txtYieldCorn, output);
-		// Rice Load Data
-		output = rice.getRiceType().c_str();
-		SetDlgItemText(txtRiceType, output);
-		output = to_string(rice.getFieldSize()).c_str();
-		SetDlgItemText(txtRiceFieldSize, output);
-		output = to_string(rice.getQuantity()).c_str();
-		SetDlgItemText(txtRiceQuantity, output);
-		output = to_string(rice.getPrice()).c_str();
-		SetDlgItemText(txtRicePrice, output);
-		output = rice.getGrowthStatus().c_str();
-		SetDlgItemText(txtRiceStatus, output);
-		output = rice.getPlantingDate().c_str();
-		SetDlgItemText(txtRicePDate, output);
-		output = rice.getHarvestingDate().c_str();
-		SetDlgItemText(txtRiceHDate, output);
-		output = to_string(rice.getGrainWeight()).c_str();
-		SetDlgItemText(txtGrainWeight, output);
-		output = to_string(rice.getGrainsPerPanicle()).c_str();
-		SetDlgItemText(txtGrainsPanicle, output);
-		output = to_string(rice.getNumPaniclesPerM2()).c_str();
-		SetDlgItemText(txtPaniclesM2, output);
-		output = to_string(rice.calculateYield()).c_str();
-		SetDlgItemText(txtYieldRice, output);
+	output = wheat.getWheatType().c_str();
+	SetDlgItemText(txtWheatType, output);
+	output = to_string(wheat.getFieldSize()).c_str();
+	SetDlgItemText(txtWheatFieldSize, output);
+	output = to_string(wheat.getQuantity()).c_str();
+	SetDlgItemText(txtWheatQuantity, output);
+	output = to_string(wheat.getPrice()).c_str();
+	SetDlgItemText(txtWheatPrice, output);
+	output = wheat.getGrowthStatus().c_str();
+	SetDlgItemText(txtWheatStatus, output);
+	output = wheat.getPlantingDate().c_str();
+	SetDlgItemText(txtWheatPDate, output);
+	output = wheat.getHarvestingDate().c_str();
+	SetDlgItemText(txtWheatHDate, output);
+	output = to_string(wheat.getHeadWeight()).c_str();
+	SetDlgItemText(txtHeadWeight, output);
+	output = to_string(wheat.getHeadsPerYard()).c_str();
+	SetDlgItemText(txtHeadsYard, output);
+	output = to_string(wheat.calculateYield()).c_str();
+	SetDlgItemText(txtYieldWheat, output);
+	// Corn load data
+	output = corn.getCornType().c_str();
+	SetDlgItemText(txtCornType, output);
+	output = to_string(corn.getFieldSize()).c_str();
+	SetDlgItemText(txtCornFieldSize, output);
+	output = to_string(corn.getQuantity()).c_str();
+	SetDlgItemText(txtCornQuantity, output);
+	output = to_string(corn.getPrice()).c_str();
+	SetDlgItemText(txtCornPrice, output);
+	output = corn.getGrowthStatus().c_str();
+	SetDlgItemText(txtCornStatus, output);
+	output = corn.getPlantingDate().c_str();
+	SetDlgItemText(txtCornPDate, output);
+	output = corn.getHarvestingDate().c_str();
+	SetDlgItemText(txtCornHDate, output);
+	output = to_string(corn.getEarWeight()).c_str();
+	SetDlgItemText(txtEarWeight, output);
+	output = to_string(corn.getKernalsPerEar()).c_str();
+	SetDlgItemText(txtKernalsEar, output);
+	output = to_string(corn.getEarsPerAcre()).c_str();
+	SetDlgItemText(txtEarsAcre, output);
+	output = to_string(corn.getShrinkage()).c_str();
+	SetDlgItemText(txtShrinkage, output);
+	output = to_string(corn.calculateYield()).c_str();
+	SetDlgItemText(txtYieldCorn, output);
+	// Rice Load Data
+	output = rice.getRiceType().c_str();
+	SetDlgItemText(txtRiceType, output);
+	output = to_string(rice.getFieldSize()).c_str();
+	SetDlgItemText(txtRiceFieldSize, output);
+	output = to_string(rice.getQuantity()).c_str();
+	SetDlgItemText(txtRiceQuantity, output);
+	output = to_string(rice.getPrice()).c_str();
+	SetDlgItemText(txtRicePrice, output);
+	output = rice.getGrowthStatus().c_str();
+	SetDlgItemText(txtRiceStatus, output);
+	output = rice.getPlantingDate().c_str();
+	SetDlgItemText(txtRicePDate, output);
+	output = rice.getHarvestingDate().c_str();
+	SetDlgItemText(txtRiceHDate, output);
+	output = to_string(rice.getGrainWeight()).c_str();
+	SetDlgItemText(txtGrainWeight, output);
+	output = to_string(rice.getGrainsPerPanicle()).c_str();
+	SetDlgItemText(txtGrainsPanicle, output);
+	output = to_string(rice.getNumPaniclesPerM2()).c_str();
+	SetDlgItemText(txtPaniclesM2, output);
+	output = to_string(rice.calculateYield()).c_str();
+	SetDlgItemText(txtYieldRice, output);
+	// Harvest Load Data
+	output = to_string(harvest.getFertilizer()).c_str();
+	SetDlgItemText(txtFertilizer, output);
+	output = to_string(harvest.getWater()).c_str();
+	SetDlgItemText(txtWater, output);
+	output = to_string(harvest.getPriceFertilizer()).c_str();
+	SetDlgItemText(txtFertilizerPrice, output);
+	output = to_string(harvest.getPriceWater()).c_str();
+	SetDlgItemText(txtWaterPrice, output);
+	output = to_string(harvest.getAmountWheat()).c_str();
+	SetDlgItemText(txtWheat, output);
+	output = to_string(harvest.getAmountCorn()).c_str();
+	SetDlgItemText(txtCorn, output);
+	output = to_string(harvest.getAmountRice()).c_str();
+	SetDlgItemText(txtRice, output);
+	output = to_string(harvest.getRevenue()).c_str();
+	SetDlgItemText(txtRevenue, output);
 	// Return the result
 	return bResult;
 }
@@ -204,6 +224,23 @@ void CropsDlg::OnBnClickedbtnprocess()
 		rice.setNumPaniclesPerM2(_ttoi(input));
 		output = to_string(rice.calculateYield()).c_str();
 		SetDlgItemText(txtYieldRice, output);
+		// harvest save data
+		GetDlgItemText(txtFertilizer, input);
+		harvest.setFertilizer(_ttof(input));
+		GetDlgItemText(txtWater, input);
+		harvest.setWater(_ttof(input));
+		GetDlgItemText(txtFertilizerPrice, input);
+		harvest.setPriceFertilizer(_ttof(input));
+		GetDlgItemText(txtWaterPrice, input);
+		harvest.setPriceWater(_ttof(input));
+		GetDlgItemText(txtWheat, input);
+		harvest.setAmountWheat(_ttof(input));
+		GetDlgItemText(txtCorn, input);
+		harvest.setAmountCorn(_ttof(input));
+		GetDlgItemText(txtRice, input);
+		harvest.setAmountRice(_ttof(input));
+		GetDlgItemText(txtRevenue, input);
+		harvest.setRevenue(_ttoi(input));
 		// Success
 		AfxMessageBox(L"Saved Successfully!");
 	}
@@ -328,4 +365,33 @@ void CropsDlg::OnDtnDatetimechangedtpriceharvesting(NMHDR* pNMHDR, LRESULT* pRes
 	output = rice.getHarvestingDate().c_str();
 	SetDlgItemText(txtRiceHDate, output);
 	*pResult = 0;
+}
+
+
+void CropsDlg::OnBnClickedtxtharvestandstore()
+{
+	// TODO: Add your control notification handler code here
+	harvest.harvestAndStore();
+	// Save and Reload all data
+	OnInitDialog();
+}
+
+
+void CropsDlg::OnBnClickedtxtsellandgeneraterevenue()
+{
+	// TODO: Add your control notification handler code here
+	harvest.SellAndGenerateRevenue();
+	// Save and Reload all data
+	OnInitDialog();
+}
+
+
+void CropsDlg::OnBnClickedtxtstartnewseason()
+{
+	// TODO: Add your control notification handler code here
+	rice.startNewSeason();
+	wheat.startNewSeason();
+	corn.startNewSeason();
+	// Save and Reload all data
+	OnInitDialog();
 }

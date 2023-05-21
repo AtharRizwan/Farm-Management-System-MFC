@@ -62,6 +62,11 @@
 #define txtYieldCorn                    1037
 #define txtEarsAcre                     1038
 #define txtKernalsEar                   1039
+#define IDC_BUTTON1                     1040
+#define txtStartNewSeason               1040
+#define txtRevenue                      1041
+#define txtHarvestAndStore              1042
+#define txtSellAndGenerateRevenue       1043
 #define txtRiceType                     1055
 #define txtRiceFieldSize                1056
 #define txtRiceQuantity                 1057
@@ -76,6 +81,13 @@
 #define txtYieldRice                    1067
 #define txtPaniclesM2                   1068
 #define txtGrainsPanicle                1069
+#define txtFertilizer                   1083
+#define txtWater                        1084
+#define txtFertilizerPrice              1085
+#define txtWaterPrice                   1086
+#define txtRice                         1089
+#define txtWheat                        1095
+#define txtCorn                         1096
 
 // Next default values for new objects
 // 
@@ -83,7 +95,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1029
+#define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

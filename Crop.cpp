@@ -688,6 +688,34 @@ void Harvest::setPriceWater(double price)
 	priceWater = price;
 }
 
+void Harvest::setAmountRice(double value) {
+	if (value < 0) {
+		throw std::invalid_argument("Amount of rice cannot be negative.");
+	}
+	amountRice = value;
+}
+
+void Harvest::setAmountWheat(double value) {
+	if (value < 0) {
+		throw std::invalid_argument("Amount of wheat cannot be negative.");
+	}
+	amountWheat = value;
+}
+
+void Harvest::setAmountCorn(double value) {
+	if (value < 0) {
+		throw std::invalid_argument("Amount of corn cannot be negative.");
+	}
+	amountCorn = value;
+}
+
+void Harvest::setRevenue(double value) {
+	if (value < 0) {
+		throw std::invalid_argument("Revenue cannot be negative.");
+	}
+	revenue = value;
+}
+
 
 // getter functions
 double Harvest::getFertilizer()
@@ -746,12 +774,12 @@ void Harvest::updateFertilizer(double amount)
 void Harvest::harvestAndStore()
 {
 	// Store the harvested amounts
-	amountWheat = Wheat::quantity;
-	Wheat::setQuantity(0);
-	amountCorn = Corn::quantity;
-	Corn::setQuantity(0);
-	amountRice = Rice::quantity;
+	amountWheat += Wheat::quantity;
+	amountCorn += Corn::quantity;
+	amountRice += Rice::quantity;
 	Rice::setQuantity(0);
+	Wheat::setQuantity(0);
+	Corn::setQuantity(0);
 }
 
 //Function to sell all harvested crops and return the revenue
