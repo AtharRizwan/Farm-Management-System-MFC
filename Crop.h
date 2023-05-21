@@ -167,10 +167,10 @@ public:
 	void setGrainWeight(double grainWeight);
 
 	// Getter functions
-	std::string setRiceType() const;
-	int setNumPaniclesPerM2() const;
-	int setGrainsPerPanicle() const;
-	double setGrainWeight() const;
+	std::string getRiceType() const;
+	int getNumPaniclesPerM2() const;
+	int getGrainsPerPanicle() const;
+	double getGrainWeight() const;
 
 	// Function to calculate yield in tonnes per acre
 	double calculateYield() const override;

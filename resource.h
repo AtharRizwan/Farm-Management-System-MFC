@@ -62,6 +62,20 @@
 #define txtYieldCorn                    1037
 #define txtEarsAcre                     1038
 #define txtKernalsEar                   1039
+#define txtRiceType                     1055
+#define txtRiceFieldSize                1056
+#define txtRiceQuantity                 1057
+#define txtRicePrice                    1058
+#define txtRiceStatus                   1059
+#define txtRiceHDate                    1060
+#define txtGrainWeight                  1061
+#define btnAdvanceStatusRice            1063
+#define dtpRicePlanting                 1064
+#define dtpRiceHarvesting               1065
+#define txtRicePDate                    1066
+#define txtYieldRice                    1067
+#define txtPaniclesM2                   1068
+#define txtGrainsPanicle                1069
 
 // Next default values for new objects
 // 

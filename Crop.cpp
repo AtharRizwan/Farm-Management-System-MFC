@@ -556,22 +556,22 @@ void Rice::setGrainWeight(double grainWeight) {
 }
 
 // Getter functions
-string Rice::setRiceType() const
+string Rice::getRiceType() const
 {
 	return riceType;
 }
 
-int Rice::setNumPaniclesPerM2() const
+int Rice::getNumPaniclesPerM2() const
 {
 	return numPaniclesPerM2;
 }
 
-int Rice::setGrainsPerPanicle() const
+int Rice::getGrainsPerPanicle() const
 {
 	return grainsPerPanicle;
 }
 
-double Rice::setGrainWeight() const
+double Rice::getGrainWeight() const
 {
 	return grainWeight;
 }

@@ -34,4 +34,9 @@ public:
 	afx_msg void OnDtnDatetimechangedtpcornharvesting(NMHDR* pNMHDR, LRESULT* pResult);
 	CDateTimeCtrl SetCornPlanting;
 	CDateTimeCtrl SetCornHarvesting;
+	CDateTimeCtrl SetRicePlanting;
+	CDateTimeCtrl SetRiceHarvesting;
+	afx_msg void OnBnClickedbtnadvancestatusrice();
+	afx_msg void OnDtnDatetimechangedtpriceplanting(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnDtnDatetimechangedtpriceharvesting(NMHDR* pNMHDR, LRESULT* pResult);
 };

@@ -40,6 +40,8 @@ void CropsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, dtpWheatHarvesting, setWheatHarvestingDate);
 	DDX_Control(pDX, dtpCornPlanting, SetCornPlanting);
 	DDX_Control(pDX, dtpCornHarvesting, SetCornHarvesting);
+	DDX_Control(pDX, dtpRicePlanting, SetRicePlanting);
+	DDX_Control(pDX, dtpRiceHarvesting, SetRiceHarvesting);
 }
 
 
@@ -51,6 +53,9 @@ BEGIN_MESSAGE_MAP(CropsDlg, CDialog)
 	ON_BN_CLICKED(btnAdvanceStatusCorn, &CropsDlg::OnBnClickedbtnadvancestatuscorn)
 	ON_NOTIFY(DTN_DATETIMECHANGE, dtpCornPlanting, &CropsDlg::OnDtnDatetimechangedtpcornplanting)
 	ON_NOTIFY(DTN_DATETIMECHANGE, dtpCornHarvesting, &CropsDlg::OnDtnDatetimechangedtpcornharvesting)
+	ON_BN_CLICKED(btnAdvanceStatusRice, &CropsDlg::OnBnClickedbtnadvancestatusrice)
+	ON_NOTIFY(DTN_DATETIMECHANGE, dtpRicePlanting, &CropsDlg::OnDtnDatetimechangedtpriceplanting)
+	ON_NOTIFY(DTN_DATETIMECHANGE, dtpRiceHarvesting, &CropsDlg::OnDtnDatetimechangedtpriceharvesting)
 END_MESSAGE_MAP()
 
 
@@ -110,6 +115,29 @@ BOOL CropsDlg::OnInitDialog()
 		SetDlgItemText(txtShrinkage, output);
 		output = to_string(corn.calculateYield()).c_str();
 		SetDlgItemText(txtYieldCorn, output);
+		// Rice Load Data
+		output = rice.getRiceType().c_str();
+		SetDlgItemText(txtRiceType, output);
+		output = to_string(rice.getFieldSize()).c_str();
+		SetDlgItemText(txtRiceFieldSize, output);
+		output = to_string(rice.getQuantity()).c_str();
+		SetDlgItemText(txtRiceQuantity, output);
+		output = to_string(rice.getPrice()).c_str();
+		SetDlgItemText(txtRicePrice, output);
+		output = rice.getGrowthStatus().c_str();
+		SetDlgItemText(txtRiceStatus, output);
+		output = rice.getPlantingDate().c_str();
+		SetDlgItemText(txtRicePDate, output);
+		output = rice.getHarvestingDate().c_str();
+		SetDlgItemText(txtRiceHDate, output);
+		output = to_string(rice.getGrainWeight()).c_str();
+		SetDlgItemText(txtGrainWeight, output);
+		output = to_string(rice.getGrainsPerPanicle()).c_str();
+		SetDlgItemText(txtGrainsPanicle, output);
+		output = to_string(rice.getNumPaniclesPerM2()).c_str();
+		SetDlgItemText(txtPaniclesM2, output);
+		output = to_string(rice.calculateYield()).c_str();
+		SetDlgItemText(txtYieldRice, output);
 	// Return the result
 	return bResult;
 }
@@ -121,9 +149,9 @@ void CropsDlg::OnBnClickedbtnprocess()
 	try
 	{
 		GetDlgItemText(txtWheatType, input);
-		CT2A pszConvertedString(input);
-		std::string type(pszConvertedString);
-		wheat.setWheatType(type);
+		CT2A pszConvertedStringWheat(input);
+		std::string WheatType(pszConvertedStringWheat);
+		wheat.setWheatType(WheatType);
 		GetDlgItemText(txtWheatFieldSize, input);
 		wheat.setFieldSize(_ttoi(input));
 		GetDlgItemText(txtWheatQuantity, input);
@@ -136,18 +164,11 @@ void CropsDlg::OnBnClickedbtnprocess()
 		wheat.setHeadsPerYard(_ttoi(input));
 		output = to_string(wheat.calculateYield()).c_str();
 		SetDlgItemText(txtYieldWheat, output);
-	}
-	catch (...)
-	{
-		AfxMessageBox(L"Error");
-	}
-	// Corn save data
-	try
-	{
+		// Corn save data
 		GetDlgItemText(txtCornType, input);
-		CT2A pszConvertedString(input);
-		std::string type(pszConvertedString);
-		corn.setCornType(type);
+		CT2A pszConvertedStringCorn(input);
+		std::string CornType(pszConvertedStringCorn);
+		corn.setCornType(CornType);
 		GetDlgItemText(txtCornFieldSize, input);
 		corn.setFieldSize(_ttoi(input));
 		GetDlgItemText(txtCornQuantity, input);
@@ -164,12 +185,32 @@ void CropsDlg::OnBnClickedbtnprocess()
 		corn.setShrinkage(_ttoi(input));
 		output = to_string(corn.calculateYield()).c_str();
 		SetDlgItemText(txtYieldCorn, output);
+		// Rice Save Data
+		GetDlgItemText(txtRiceType, input);
+		CT2A pszConvertedStringRice(input);
+		std::string RiceType(pszConvertedStringRice);
+		rice.setRiceType(RiceType);
+		GetDlgItemText(txtRiceFieldSize, input);
+		rice.setFieldSize(_ttoi(input));
+		GetDlgItemText(txtRiceQuantity, input);
+		rice.setQuantity(_ttof(input));
+		GetDlgItemText(txtRicePrice, input);
+		rice.setPrice(_ttof(input));
+		GetDlgItemText(txtGrainWeight, input);
+		rice.setGrainWeight(_ttof(input));
+		GetDlgItemText(txtGrainsPanicle, input);
+		rice.setGrainsPerPanicle(_ttoi(input));
+		GetDlgItemText(txtPaniclesM2, input);
+		rice.setNumPaniclesPerM2(_ttoi(input));
+		output = to_string(rice.calculateYield()).c_str();
+		SetDlgItemText(txtYieldRice, output);
+		// Success
+		AfxMessageBox(L"Saved Successfully!");
 	}
 	catch (...)
 	{
 		AfxMessageBox(L"Error");
 	}
-	AfxMessageBox(L"Saved Successfully!");
 }
 
 
@@ -247,5 +288,44 @@ void CropsDlg::OnDtnDatetimechangedtpcornharvesting(NMHDR* pNMHDR, LRESULT* pRes
 	corn.setHarvestingDate(hDate);
 	output = corn.getHarvestingDate().c_str();
 	SetDlgItemText(txtCornHDate, output);
+	*pResult = 0;
+}
+
+
+void CropsDlg::OnBnClickedbtnadvancestatusrice()
+{
+	// TODO: Add your control notification handler code here
+	rice.advanceStatus();
+	output = rice.getGrowthStatus().c_str();
+	SetDlgItemText(txtRiceStatus, output);
+}
+
+
+void CropsDlg::OnDtnDatetimechangedtpriceplanting(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	CTime plantingDate;
+	SetRicePlanting.GetTime(plantingDate);
+	string pDate;
+	pDate = to_string(plantingDate.GetMonth()) + "/" + to_string(plantingDate.GetDay()) + "/" + to_string(plantingDate.GetYear());
+	rice.setPlantingDate(pDate);
+	output = rice.getPlantingDate().c_str();
+	SetDlgItemText(txtRicePDate, output);
+	*pResult = 0;
+}
+
+
+void CropsDlg::OnDtnDatetimechangedtpriceharvesting(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+	CTime harvestingDate;
+	SetRiceHarvesting.GetTime(harvestingDate);
+	string hDate;
+	hDate = to_string(harvestingDate.GetMonth()) + "/" + to_string(harvestingDate.GetDay()) + "/" + to_string(harvestingDate.GetYear());
+	rice.setHarvestingDate(hDate);
+	output = rice.getHarvestingDate().c_str();
+	SetDlgItemText(txtRiceHDate, output);
 	*pResult = 0;
 }
