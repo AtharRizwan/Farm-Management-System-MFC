@@ -6,6 +6,7 @@
 
 class CropsDlg : public CDialog
 {
+	virtual BOOL OnInitDialog();
 	DECLARE_DYNAMIC(CropsDlg)
 
 public:
@@ -21,4 +22,6 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedbtnprocess();
 };

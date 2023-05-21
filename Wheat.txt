@@ -1,0 +1,9 @@
+Bread Wheat
+50
+100
+40000
+Germination
+5/21/2023
+Not Set
+30
+0.03
