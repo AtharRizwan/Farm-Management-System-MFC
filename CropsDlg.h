@@ -13,7 +13,6 @@ class CropsDlg : public CDialog
 public:
 	CropsDlg(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CropsDlg();
-	void saveData();
 
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 // Dialog Data
