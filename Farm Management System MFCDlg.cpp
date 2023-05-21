@@ -135,17 +135,28 @@ void CFarmManagementSystemMFCDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CFarmManagementSystemMFCDlg::OnPaint()
 {
+	CPaintDC dc(this); // device context for painting
+	CRect rect;
+	GetClientRect(&rect);
+	int r, g, b;
+	r = 104;
+	g = 166;
+	b = 145;
+
+	CBrush myb;
+	myb.CreateSolidBrush(RGB(r, g, b));
+	dc.FillRect(&rect, &myb);
+
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // device context for painting
+
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
 		// Center icon in client rectangle
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
+
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 

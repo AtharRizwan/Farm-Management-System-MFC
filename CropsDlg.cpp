@@ -21,6 +21,19 @@ CString input;
 
 // CropsDlg dialog
 
+HBRUSH CropsDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) {
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// Check if the control is the dialog itself
+	if (pWnd == this) {
+		// Set the background color of the dialog
+		pDC->SetBkColor(RGB(104, 166, 145));  // Set your desired background color here
+		hbr = m_backgroundBrush;
+	}
+
+	return hbr;
+}
+
 IMPLEMENT_DYNAMIC(CropsDlg, CDialog)
 
 CropsDlg::CropsDlg(CWnd* pParent /*=nullptr*/)
@@ -59,6 +72,7 @@ BEGIN_MESSAGE_MAP(CropsDlg, CDialog)
 	ON_BN_CLICKED(txtHarvestAndStore, &CropsDlg::OnBnClickedtxtharvestandstore)
 	ON_BN_CLICKED(txtSellAndGenerateRevenue, &CropsDlg::OnBnClickedtxtsellandgeneraterevenue)
 	ON_BN_CLICKED(txtStartNewSeason, &CropsDlg::OnBnClickedtxtstartnewseason)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -70,6 +84,7 @@ BOOL CropsDlg::OnInitDialog()
 {
 	// Call the base class implementation
 	BOOL bResult = CDialog::OnInitDialog();
+	m_backgroundBrush.CreateSolidBrush(RGB(104, 166, 145));
 
 	// Perform your desired task here
 	// Wheat load data
