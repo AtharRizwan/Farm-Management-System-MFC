@@ -24,4 +24,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedbtnprocess();
+	afx_msg void OnBnClickedbtnadvancestatuswheat();
+	afx_msg void OnDtnDatetimechangedtpwheatplanting(NMHDR* pNMHDR, LRESULT* pResult);
+	CDateTimeCtrl SetWheatPlantingDate;
+	afx_msg void OnDtnDatetimechangedtpwheatharvesting(NMHDR* pNMHDR, LRESULT* pResult);
+	CDateTimeCtrl setHarvestingDate;
 };
