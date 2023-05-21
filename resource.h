@@ -34,22 +34,6 @@
 #define dtpWheatPlanting                1026
 #define dtpWheatHarvesting              1027
 #define txtYieldWheat                   1028
-#define txtCornType                     1038
-#define txtCornFieldSize                1039
-#define txtCornQuantity                 1040
-#define txtCornPrice                    1041
-#define txtCornStatus                   1042
-#define txtCornHDate                    1043
-#define txtEarsPerAcre                  1044
-#define txtEarWeight                    1045
-#define btnAdvanceStatusCorn            1046
-#define dtpWheatPlanting2               1047
-#define dtpWheatHarvesting2             1048
-#define txtCornPDate                    1049
-#define txtYieldWheat2                  1050
-#define txtEarsPerAcre2                 1051
-#define txtKernalsPerEar                1051
-#define txtEarWeight2                   1052
 
 // Next default values for new objects
 // 
