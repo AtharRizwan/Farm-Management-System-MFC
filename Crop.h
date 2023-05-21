@@ -188,14 +188,14 @@ private:
 	friend Crop;
 
 	// data members
-	static double fertilizer;
-	static double water;
-	double priceFertilizer;
-	double priceWater;
-	double amountRice;
-	double amountWheat;
-	double amountCorn;
-	double revenue;
+	static double fertilizer;	// in kg
+	static double water;	// in litres
+	double priceFertilizer;	// in Rs per kg
+	double priceWater;	// in Rs per litres
+	double amountRice;	// in tonnes
+	double amountWheat;	// in tonnes
+	double amountCorn;	// in tonnes
+	double revenue;	// in Rs.
 
 public:
 	// Constructor to load data

@@ -5,6 +5,10 @@
 #include "Farm Management System MFC.h"
 #include "afxdialogex.h"
 #include "HomePageDlg.h"
+#include "CropsDlg.h"
+#include "AnimalsDlg.h"
+#include "EmployeesDlg.h"
+#include "MedicineDlg.h"
 
 
 // HomePageDlg dialog
@@ -28,7 +32,43 @@ void HomePageDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(HomePageDlg, CDialog)
+	ON_BN_CLICKED(btnCrops, &HomePageDlg::OnBnClickedbtncrops)
+	ON_BN_CLICKED(BtnAnimals, &HomePageDlg::OnBnClickedBtnanimals)
+	ON_BN_CLICKED(BtnAnimals2, &HomePageDlg::OnBnClickedBtnanimals2)
+	ON_BN_CLICKED(BtnAnimals3, &HomePageDlg::OnBnClickedBtnanimals3)
 END_MESSAGE_MAP()
 
 
 // HomePageDlg message handlers
+
+
+void HomePageDlg::OnBnClickedbtncrops()
+{
+	// TODO: Add your control notification handler code here
+	CropsDlg Dlg;
+	Dlg.DoModal();
+}
+
+
+void HomePageDlg::OnBnClickedBtnanimals()
+{
+	// TODO: Add your control notification handler code here
+	AnimalsDlg Dlg;
+	Dlg.DoModal();
+}
+
+
+void HomePageDlg::OnBnClickedBtnanimals2()
+{
+	// TODO: Add your control notification handler code here
+	EmployeesDlg Dlg;
+	Dlg.DoModal();
+}
+
+
+void HomePageDlg::OnBnClickedBtnanimals3()
+{
+	// TODO: Add your control notification handler code here
+	MedicineDlg Dlg;
+	Dlg.DoModal();
+}
