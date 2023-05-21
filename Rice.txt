@@ -1,10 +1,10 @@
 Brown Rice
-0
-0
+50
+100
 40000
-Not Planted
-Not set
-Not set
-0
-0
-0
+Germination
+5/21/2023
+Not Set
+500
+150
+0.02

@@ -1,11 +1,11 @@
 Dent Corn
-0
-0
+50
+100
 40000
-Not Planted
-Not set
-Not set
-0
-0
-0
-0
+Germination
+5/21/2023
+Not Set
+400
+0.03
+100
+10
