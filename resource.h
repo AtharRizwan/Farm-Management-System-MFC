@@ -22,18 +22,46 @@
 #define BtnAnimals3                     1011
 #define txtWheatType                    1011
 #define txtWheatFieldSize               1012
+#define txtWheatType2                   1013
+#define txtCornType                     1013
 #define txtWheatQuantity                1014
 #define txtWheatPrice                   1015
 #define txtWheatStatus                  1016
 #define txtWheatPDate                   1017
 #define txtWheatHDate                   1018
+#define txtWheatFieldSize2              1019
+#define txtCornFieldSize                1019
 #define txtHeadsYard                    1020
 #define txtHeadWeight                   1021
+#define txtWheatQuantity2               1022
+#define txtCornQuantity                 1022
+#define txtWheatPrice2                  1023
+#define txtCornPrice                    1023
 #define btnProcess                      1024
 #define btnAdvanceStatusWheat           1025
 #define dtpWheatPlanting                1026
 #define dtpWheatHarvesting              1027
 #define txtYieldWheat                   1028
+#define txtWheatStatus2                 1029
+#define txtCornStatus                   1029
+#define txtWheatHDate2                  1030
+#define txtCornHDate                    1030
+#define txtHeadsYard2                   1031
+#define txtEarWeight                    1031
+#define txtHeadWeight2                  1032
+#define txtShrinkage                    1032
+#define btnAdvanceStatusWheat2          1033
+#define btnAdvanceStatusCorn            1033
+#define dtpWheatPlanting2               1034
+#define dtpCornPlanting                 1034
+#define dtpWheatHarvesting2             1035
+#define dtpCornHarvesting               1035
+#define txtWheatPDate2                  1036
+#define txtCornPDate                    1036
+#define txtYieldWheat2                  1037
+#define txtYieldCorn                    1037
+#define txtEarsAcre                     1038
+#define txtKernalsEar                   1039
 
 // Next default values for new objects
 // 

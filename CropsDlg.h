@@ -28,5 +28,10 @@ public:
 	afx_msg void OnDtnDatetimechangedtpwheatplanting(NMHDR* pNMHDR, LRESULT* pResult);
 	CDateTimeCtrl SetWheatPlantingDate;
 	afx_msg void OnDtnDatetimechangedtpwheatharvesting(NMHDR* pNMHDR, LRESULT* pResult);
-	CDateTimeCtrl setHarvestingDate;
+	CDateTimeCtrl setWheatHarvestingDate;
+	afx_msg void OnBnClickedbtnadvancestatuscorn();
+	afx_msg void OnDtnDatetimechangedtpcornplanting(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnDtnDatetimechangedtpcornharvesting(NMHDR* pNMHDR, LRESULT* pResult);
+	CDateTimeCtrl SetCornPlanting;
+	CDateTimeCtrl SetCornHarvesting;
 };
