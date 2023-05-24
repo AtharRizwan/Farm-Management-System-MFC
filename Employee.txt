@@ -1,0 +1,5 @@
+Ahmad 32 55000 
+Abubakar 28 48000
+Farhan 35 62000
+Burhan 31 54000
+Umer 29 50000

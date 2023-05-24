@@ -6,6 +6,7 @@
 #include "afxdialogex.h"
 #include "HomePageDlg.h"
 #include "CropsDlg.h"
+#include "EmployeeDlg.h"
 
 
 // HomePageDlg dialog
@@ -56,6 +57,7 @@ void HomePageDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(HomePageDlg, CDialog)
 	ON_BN_CLICKED(btnCrops, &HomePageDlg::OnBnClickedbtncrops)
 	ON_WM_CTLCOLOR()
+	ON_BN_CLICKED(btnEmployeeDlg, &HomePageDlg::OnBnClickedbtnemployeedlg)
 END_MESSAGE_MAP()
 
 
@@ -66,5 +68,13 @@ void HomePageDlg::OnBnClickedbtncrops()
 {
 	// TODO: Add your control notification handler code here
 	CropsDlg Dlg;
+	Dlg.DoModal();
+}
+
+
+void HomePageDlg::OnBnClickedbtnemployeedlg()
+{
+	// TODO: Add your control notification handler code here
+	EmployeeDlg Dlg;
 	Dlg.DoModal();
 }

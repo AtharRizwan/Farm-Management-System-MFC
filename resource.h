@@ -9,6 +9,7 @@
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG1                     130
 #define IDD_DIALOG2                     132
+#define IDD_DIALOG3                     140
 #define txtUsername                     1000
 #define txtPassword                     1001
 #define btnLogin                        1002
@@ -61,10 +62,19 @@
 #define txtKernalsEar                   1039
 #define IDC_BUTTON1                     1040
 #define txtStartNewSeason               1040
+#define btnEmployeeDlg                  1040
+#define btnAddEmployee                  1040
 #define txtRevenue                      1041
+#define btnAddEmployee2                 1041
 #define txtHarvestAndStore              1042
 #define txtSellAndGenerateRevenue       1043
+#define IDC_EDIT2                       1049
+#define txtAge                          1050
+#define IDC_EDIT4                       1051
+#define txtSalary                       1051
+#define listEmpData                     1054
 #define txtRiceType                     1055
+#define txtName                         1055
 #define txtRiceFieldSize                1056
 #define txtRiceQuantity                 1057
 #define txtRicePrice                    1058
@@ -90,9 +100,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        140
+#define _APS_NEXT_RESOURCE_VALUE        142
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1044
+#define _APS_NEXT_CONTROL_VALUE         1056
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

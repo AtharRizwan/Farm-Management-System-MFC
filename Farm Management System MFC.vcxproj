@@ -185,6 +185,8 @@
   <ItemGroup>
     <ClInclude Include="Crop.h" />
     <ClInclude Include="CropsDlg.h" />
+    <ClInclude Include="employee.h" />
+    <ClInclude Include="EmployeeDlg.h" />
     <ClInclude Include="Farm Management System MFC.h" />
     <ClInclude Include="Farm Management System MFCDlg.h" />
     <ClInclude Include="framework.h" />
@@ -196,6 +198,8 @@
   <ItemGroup>
     <ClCompile Include="Crop.cpp" />
     <ClCompile Include="CropsDlg.cpp" />
+    <ClCompile Include="employee.cpp" />
+    <ClCompile Include="EmployeeDlg.cpp" />
     <ClCompile Include="Farm Management System MFC.cpp" />
     <ClCompile Include="Farm Management System MFCDlg.cpp" />
     <ClCompile Include="HomePageDlg.cpp" />
@@ -210,6 +214,7 @@
     <ResourceCompile Include="FarmManagementSystemMFC.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resource.hm" />
     <None Include="res\FarmManagementSystemMFC.rc2" />
   </ItemGroup>
   <ItemGroup>
