@@ -24,8 +24,18 @@
 // Home
 #define IDC_OPEN_CROPS                  1020
 #define IDC_OPEN_EMPLOYEES              1021
-#define IDC_SUMMARY                     1022
 #define IDC_LOGOUT                      1023
+#define IDC_HOME_WHEAT_STATUS           1024
+#define IDC_HOME_CORN_STATUS            1025
+#define IDC_HOME_RICE_STATUS            1026
+#define IDC_HOME_WHEAT_STORED           1027
+#define IDC_HOME_CORN_STORED            1028
+#define IDC_HOME_RICE_STORED            1029
+#define IDC_HOME_REVENUE                1030
+#define IDC_HOME_EMPLOYEES              1031
+#define IDC_HOME_HEADER_CROP            1032
+#define IDC_HOME_HEADER_STAGE           1033
+#define IDC_HOME_HEADER_STORED          1034
 
 // Crops: wheat
 #define IDC_WHEAT_VARIETY               1100

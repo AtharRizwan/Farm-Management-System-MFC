@@ -89,6 +89,11 @@ void ThemedDialog::ShowError(const CString& message)
 	}
 }
 
+void ThemedDialog::UseBoldFont(CWnd* control)
+{
+	control->SetFont(&m_boldFont);
+}
+
 CString ToCString(const std::string& utf8)
 {
 	return CString(CA2W(utf8.c_str(), CP_UTF8));

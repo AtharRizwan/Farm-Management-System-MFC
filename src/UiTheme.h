@@ -27,6 +27,8 @@ protected:
 
 	// Shows a message in the IDC_ERROR label, or hides it when empty
 	void ShowError(const CString& message);
+	// Draws the control's text in the dialog's bold font
+	void UseBoldFont(CWnd* control);
 
 private:
 	CBrush m_backgroundBrush;
