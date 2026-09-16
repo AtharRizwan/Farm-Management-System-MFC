@@ -44,7 +44,7 @@ BOOL EmployeeDlg::OnInitDialog()
 	m_backgroundBrush.CreateSolidBrush(RGB(104, 166, 145));
 	try
 	{
-		file.open("Employee.txt", std::ios::in | std::ios::binary);
+		file.open("data/Employee.txt", std::ios::in | std::ios::binary);
 		if (!file.is_open())
 		{
 			throw "Unable to open file";
@@ -116,7 +116,7 @@ void EmployeeDlg::OnBnClickedbtnaddemployee()
 	std::fstream file;
 	try
 	{
-		file.open("Employee.txt", std::ios::app);
+		file.open("data/Employee.txt", std::ios::app);
 		if (!file.is_open())
 		{
 			throw "Unable to open file";
@@ -166,7 +166,7 @@ void EmployeeDlg::OnBnClickedbtnaddemployee2()
 		string buffer;
 		std::fstream file;
 
-		file.open("Employee.txt", std::ios::app);
+		file.open("data/Employee.txt", std::ios::app);
 		if (!file.is_open())
 		{
 			throw "Unable to open file";
@@ -175,7 +175,7 @@ void EmployeeDlg::OnBnClickedbtnaddemployee2()
 		file << employee.getName() + " " + to_string(employee.getAge()) + " " + to_string(employee.getSalary()) << endl;
 		file.close();
 
-		file.open("Employee.txt", std::ios::in);
+		file.open("data/Employee.txt", std::ios::in);
 		if (!file.is_open())
 		{
 			throw "Unable to open file";

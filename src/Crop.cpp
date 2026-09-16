@@ -162,7 +162,7 @@ double Crop::calculateYield() const
 // record any pest infestations
 void Crop::recordPestInfestation(string date, string description)
 {
-	file.open("Pest Infestation record.txt", ios::app);
+	file.open("data/Pest Infestation record.txt", ios::app);
 	if (!file.is_open())
 	{
 		throw "Unable to Open File!";
@@ -176,7 +176,7 @@ void Crop::recordPestInfestation(string date, string description)
 // record any disease outbreaks
 void Crop::recordDiseaseOutbreak(string date, string description)
 {
-	file.open("Crop Disease record.txt", ios::app);
+	file.open("data/Crop Disease record.txt", ios::app);
 	if (!file.is_open())
 	{
 		throw "Unable to Open File!";
@@ -199,7 +199,7 @@ void Crop::recordCropWatering(string date, double water)
 	{
 		throw "Insufficient water!";
 	}
-	file.open("Crop Watering record.txt", ios::app);
+	file.open("data/Crop Watering record.txt", ios::app);
 	if (!file.is_open())
 	{
 		throw "Unable to Open File!";
@@ -221,7 +221,7 @@ void Crop::recordFertilization(string date, double fertilizer)
 	{
 		throw "Insufficient fertilizer!";
 	}
-	file.open("Crop Fertilization record.txt", ios::app);
+	file.open("data/Crop Fertilization record.txt", ios::app);
 	if (!file.is_open())
 	{
 		throw "Unable to Open File!";
@@ -251,7 +251,7 @@ void Crop::startNewSeason()
 Wheat::Wheat() {
 	name = "Wheat";
 	// Load all data
-	file.open("Wheat.txt", ios::in);
+	file.open("data/Wheat.txt", ios::in);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
@@ -332,7 +332,7 @@ void Wheat::startNewSeason()
 Wheat::~Wheat()
 {
 	// open file
-	file.open("Wheat.txt", ios::out);
+	file.open("data/Wheat.txt", ios::out);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
@@ -360,7 +360,7 @@ Corn::Corn()
 {
 	name = "Corn";
 	// Load all data
-	file.open("Corn.txt", ios::in);
+	file.open("data/Corn.txt", ios::in);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
@@ -470,7 +470,7 @@ void Corn::startNewSeason()
 Corn::~Corn()
 {
 	// open file
-	file.open("Corn.txt", ios::out);
+	file.open("data/Corn.txt", ios::out);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
@@ -500,7 +500,7 @@ Rice::Rice()
 {
 	name = "Rice";
 	// Load all data
-	file.open("Rice.txt", ios::in);
+	file.open("data/Rice.txt", ios::in);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
@@ -595,7 +595,7 @@ void Rice::startNewSeason()
 Rice::~Rice()
 {
 	// open file
-	file.open("Rice.txt", ios::out);
+	file.open("data/Rice.txt", ios::out);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
@@ -629,7 +629,7 @@ double Harvest::fertilizer = 0;
 Harvest::Harvest()
 {
 	// open file
-	file.open("Harvest.txt", ios::in);
+	file.open("data/Harvest.txt", ios::in);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
@@ -801,7 +801,7 @@ void Harvest::SellAndGenerateRevenue()
 Harvest::~Harvest()
 {
 	// Open file
-	file.open("Harvest.txt", ios::out);
+	file.open("data/Harvest.txt", ios::out);
 	if (!file.is_open())
 	{
 		throw "Unable to open file!";
