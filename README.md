@@ -54,7 +54,19 @@ ninja -C build
 wine build/FarmManagementSystem.exe
 ```
 
-See [CLAUDE.md](CLAUDE.md) for toolchain setup notes, including a workaround for resource files that msvc-wine's installer corrupts.
+Toolchain setup notes:
+
+- Install `msitools`, then install only the packages this project needs:
+  ```bash
+  ./vsdownload.py --accept-license --architecture x64 --skip-recommended --dest ~/msvc \
+      Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+      Microsoft.VisualStudio.Component.VC.ATLMFC \
+      Microsoft.VisualStudio.Component.Windows11SDK.26100
+  ./install.sh ~/msvc
+  ```
+- `install.sh` corrupts the UTF-16 `.rc` files and binary resources in `atlmfc/include`. After installing, replace every non-header file in that folder with a clean copy. To get one, unpack the headers package separately: `./vsdownload.py --accept-license --only-unpack --skip-recommended --dest <tmp> Microsoft.VC.<version>.MFC.Headers.base`.
+- In the same folder, add lowercase symlinks for the ribbon style folders (`aqua` → `Aqua`, and the same for `black`, `blue`, `silver` and `windows7`).
+- Build in Release mode, because Debug builds need `winbind` under Wine.
 
 ## Data files
 
