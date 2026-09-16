@@ -4,16 +4,22 @@ A Windows desktop application for managing a small farm, written in C++ with Mic
 
 ## Features
 
-- **Login screen.** The default credentials are `admin` / `admin`.
+- **Login screen.** The default credentials are `admin` / `admin`. You can log out from the home page and sign in again.
+- **Home page** with an overview of crop growth stages, stored crops, total revenue and the number of employees.
 - **Crops** (wheat, corn, rice):
-  - View and edit each crop's variety, field size, quantity, price, and planting and harvesting dates.
-  - Advance a crop through its growth stages: Germination → Seedling → Vegetative → Flowering → Filling → Maturity.
-  - See the estimated yield (tonnes per acre). Each crop has its own formula: heads per yard and head weight for wheat; ears per acre, kernels per ear, ear weight and shrinkage for corn; panicles per m², grains per panicle and grain weight for rice.
-- **Harvest:**
-  - Track water and fertilizer amounts and prices.
-  - Harvest and store crops, then sell the stored crops to generate revenue.
-  - Start a new season, which resets all crops.
-- **Employees:** view the employee list and add new employees (name, age, salary).
+  - Edit each crop's variety, field size, quantity, price, and planting and harvesting dates. Every field is checked before anything is saved, and the message names any field that needs fixing.
+  - Move a crop through its growth stages: Not Planted → Germination → Seedling → Vegetative → Flowering → Filling → Maturity.
+  - See the estimated yield in tonnes per acre, which updates as you type:
+    - wheat: heads per square yard × head weight
+    - corn: ears per acre × kernels per ear × kernel weight, less the shrinkage
+    - rice: panicles per m² × grains per panicle × grain weight
+  - **Field Log** for each crop: water or fertilize it from storage (the amount is taken off the stock), or record a pest infestation or disease outbreak.
+- **Storage and sales:**
+  - Track water and fertilizer stock and prices.
+  - **Harvest Matured Crops** stores every crop that has reached Maturity. It uses the quantity you entered, or the estimated yield for the whole field if the quantity is 0.
+  - **Sell All Stored Crops** sells the stored crops at each crop's own price and adds the money to the revenue.
+  - **Start New Season** resets all three crops, after you confirm. Stored crops, prices and revenue are kept.
+- **Employees:** a table of all employees, with add, update and remove (remove asks you to confirm).
 
 ## Project structure
 
@@ -24,10 +30,13 @@ A Windows desktop application for managing a small farm, written in C++ with Mic
 ├── src/                             # Visual Studio project, C++ sources and resources
 │   ├── Crop.h / Crop.cpp            # Crop base class, Wheat/Corn/Rice, Harvest
 │   ├── employee.h / employee.cpp    # Employee class
-│   ├── *Dlg.h / *Dlg.cpp            # Dialogs: login, home, crops, employees
+│   ├── FarmData.h / FarmData.cpp    # All farm data, loaded at startup and saved on each change
+│   ├── UiTheme.h / UiTheme.cpp      # Shared dialog base class, colors and input helpers
+│   ├── *Dlg.h / *Dlg.cpp            # Dialogs: login, home, crops, field log, employees
 │   ├── FarmManagementSystemMFC.rc   # Dialog layouts and resources
 │   └── res/                         # Icon and extra resources
-└── data/                            # Data files the app reads and writes at runtime
+├── defaults/                        # Starting data, copied into data/ on first run
+└── data/                            # The app's saved data (created at runtime, ignored by git)
 ```
 
 ## Building and running
@@ -70,12 +79,14 @@ Toolchain setup notes:
 
 ## Data files
 
-The app loads its state from `data/` when it starts and saves it back when it closes. **Always start it from the repository root**, or it won't find these files and will crash on startup.
+The app keeps its state in `data/`. At startup it copies any file that is missing there from `defaults/`, so the first run starts with the sample data. To reset a file, delete it from `data/`. The app saves a file as soon as its data changes (Save, an action button, or an employee change). `data/` is ignored by git.
+
+**Always start the app from the repository root.** If a file cannot be loaded, the app shows which file and line caused the problem, then exits.
 
 | File | Contents |
 |------|----------|
-| `Wheat.txt`, `Corn.txt`, `Rice.txt` | One value per line: variety, field size, quantity, price, growth status, dates, then the crop's yield parameters |
+| `Wheat.txt`, `Corn.txt`, `Rice.txt` | One value per line: variety, field size, quantity, price, growth status, planting date, harvesting date, then the crop's yield inputs |
 | `Harvest.txt` | Fertilizer and water amounts and prices, stored amount of each crop, total revenue |
-| `Employee.txt` | One employee per line: `name age salary` |
+| `Employee.txt` | One employee per line: `name age salary` (the name may contain spaces) |
 
-`Crop` also has functions that append pest, disease, watering and fertilization logs (`* record.txt`) to `data/`. The UI doesn't use them yet, and git ignores these files.
+These files are in both `defaults/` and `data/`. The Field Log also adds entries to `Crop Watering record.txt`, `Crop Fertilization record.txt`, `Pest Infestation record.txt` and `Crop Disease record.txt` in `data/`.

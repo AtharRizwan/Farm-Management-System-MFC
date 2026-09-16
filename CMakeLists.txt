@@ -14,8 +14,11 @@ add_executable(FarmManagementSystem WIN32
 	"src/EmployeeDlg.cpp"
 	"src/Farm Management System MFC.cpp"
 	"src/Farm Management System MFCDlg.cpp"
+	"src/FarmData.cpp"
+	"src/FieldLogDlg.cpp"
 	"src/HomePageDlg.cpp"
 	"src/pch.cpp"
+	"src/UiTheme.cpp"
 	"src/FarmManagementSystemMFC.rc"
 )
 

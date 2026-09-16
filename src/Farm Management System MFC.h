@@ -9,6 +9,7 @@
 #endif
 
 #include "resource.h"		// main symbols
+#include "FarmData.h"
 
 
 // CFarmManagementSystemMFCApp:
@@ -19,6 +20,8 @@ class CFarmManagementSystemMFCApp : public CWinApp
 {
 public:
 	CFarmManagementSystemMFCApp();
+
+	FarmData m_farm;
 
 // Overrides
 public:

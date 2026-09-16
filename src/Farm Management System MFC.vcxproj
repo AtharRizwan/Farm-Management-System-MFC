@@ -191,6 +191,8 @@
     <ClInclude Include="CropsDlg.h" />
     <ClInclude Include="employee.h" />
     <ClInclude Include="EmployeeDlg.h" />
+    <ClInclude Include="FarmData.h" />
+    <ClInclude Include="FieldLogDlg.h" />
     <ClInclude Include="Farm Management System MFC.h" />
     <ClInclude Include="Farm Management System MFCDlg.h" />
     <ClInclude Include="framework.h" />
@@ -198,15 +200,19 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="UiTheme.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Crop.cpp" />
     <ClCompile Include="CropsDlg.cpp" />
     <ClCompile Include="employee.cpp" />
     <ClCompile Include="EmployeeDlg.cpp" />
+    <ClCompile Include="FarmData.cpp" />
+    <ClCompile Include="FieldLogDlg.cpp" />
     <ClCompile Include="Farm Management System MFC.cpp" />
     <ClCompile Include="Farm Management System MFCDlg.cpp" />
     <ClCompile Include="HomePageDlg.cpp" />
+    <ClCompile Include="UiTheme.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -218,7 +224,6 @@
     <ResourceCompile Include="FarmManagementSystemMFC.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resource.hm" />
     <None Include="res\FarmManagementSystemMFC.rc2" />
   </ItemGroup>
   <ItemGroup>

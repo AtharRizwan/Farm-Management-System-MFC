@@ -364,5 +364,5 @@ FodyWeavers.xsd
 # CMake build directory (msvc-wine)
 /build/
 
-# Runtime logs written by the app
-/data/* record.txt
+# Runtime data written by the app (starting data is in defaults/)
+/data/

@@ -1,30 +1,30 @@
 #pragma once
-#include "afxdialogex.h"
+#include "UiTheme.h"
 
 
-// HomePageDlg dialog
-
-class HomePageDlg : public CDialog
+// Home page. DoModal returns IDC_LOGOUT when the user logs out.
+class HomePageDlg : public ThemedDialog
 {
-	CBrush m_backgroundBrush;
-	virtual BOOL OnInitDialog();
 	DECLARE_DYNAMIC(HomePageDlg)
 
 public:
 	HomePageDlg(CWnd* pParent = nullptr);   // standard constructor
-	virtual ~HomePageDlg();
 
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_DIALOG1 };
+	enum { IDD = IDD_HOME };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+	BOOL OnInitDialog() override;
+	void OnOK() override;
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedbtncrops();
-	afx_msg void OnBnClickedbtnemployeedlg();
+
+	afx_msg void OnOpenCrops();
+	afx_msg void OnOpenEmployees();
+	afx_msg void OnLogout();
+
+private:
+	void UpdateSummary();
+	HICON m_hIcon;
 };

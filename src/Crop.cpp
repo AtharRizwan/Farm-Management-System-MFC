@@ -1,56 +1,240 @@
 #include "pch.h"
-#include <iostream>
-#include <string>
+#include <algorithm>
+#include <cctype>
+#include <cstdio>
+#include <cmath>
+#include <ctime>
 #include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include "Crop.h"
 
 using namespace std;
 
-string buffer;
-fstream file;
+const char* const kDateNotSet = "Not set";
 
-// initialization of static members
-double Crop::price = 0;
-double Crop::quantity = 0;
+namespace
+{
+	const char* const kStatusNotPlanted = "Not Planted";
+	const char* const kStatusMaturity = "Maturity";
+	const char* const kStatusHarvested = "Harvested";
+
+	// Throws std::runtime_error with the file name and the problem
+	[[noreturn]] void fail(const string& path, const string& problem)
+	{
+		throw runtime_error(path + ": " + problem);
+	}
+
+	string trim(const string& s)
+	{
+		const char* ws = " \t\r\n";
+		size_t first = s.find_first_not_of(ws);
+		if (first == string::npos)
+		{
+			return "";
+		}
+		return s.substr(first, s.find_last_not_of(ws) - first + 1);
+	}
+
+	string readLine(istream& in, const string& path, int& line)
+	{
+		string buffer;
+		++line;
+		if (!getline(in, buffer))
+		{
+			fail(path, "missing value on line " + to_string(line));
+		}
+		return trim(buffer);
+	}
+
+	double readDouble(istream& in, const string& path, int& line)
+	{
+		string text = readLine(in, path, line);
+		try
+		{
+			size_t used = 0;
+			double value = stod(text, &used);
+			if (used == text.size() && isfinite(value))
+			{
+				return value;
+			}
+		}
+		catch (const logic_error&)
+		{
+		}
+		fail(path, "line " + to_string(line) + " is not a number: \"" + text + "\"");
+	}
+
+	int readInt(istream& in, const string& path, int& line)
+	{
+		string text = readLine(in, path, line);
+		try
+		{
+			size_t used = 0;
+			int value = stoi(text, &used);
+			if (used == text.size())
+			{
+				return value;
+			}
+		}
+		catch (const logic_error&)
+		{
+		}
+		fail(path, "line " + to_string(line) + " is not a whole number: \"" + text + "\"");
+	}
+
+	// Calls a setter and reports a rejected value with its line number
+	template <typename Setter>
+	void applyValue(const string& path, int line, Setter setter)
+	{
+		try
+		{
+			setter();
+		}
+		catch (const invalid_argument& e)
+		{
+			fail(path, "line " + to_string(line) + ": " + e.what());
+		}
+	}
+
+	ifstream openForReading(const string& path)
+	{
+		ifstream in(path);
+		if (!in)
+		{
+			fail(path, "cannot open file for reading");
+		}
+		return in;
+	}
+
+	// Data files are written to a temporary file first, which then replaces
+	// the real one, so a failed save never leaves a half-written file.
+	string tempPath(const string& path)
+	{
+		return path + ".tmp";
+	}
+
+	ofstream openForWriting(const string& path)
+	{
+		ofstream out(tempPath(path), ios::trunc);
+		if (!out)
+		{
+			fail(path, "cannot open file for writing");
+		}
+		out.precision(15);
+		return out;
+	}
+
+	void finishWriting(ofstream& out, const string& path)
+	{
+		out.close();
+		if (!out || !MoveFileExA(tempPath(path).c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))
+		{
+			remove(tempPath(path).c_str());
+			fail(path, "could not write file");
+		}
+	}
+
+	void appendRecord(const string& path, const string& crop, const string& date, const string& detail)
+	{
+		ofstream out(path, ios::app);
+		if (!out)
+		{
+			fail(path, "cannot open file for writing");
+		}
+		out << "Crop: " << crop << '\n';
+		out << "Date: " << date << '\n';
+		out << detail << "\n\n";
+		out.close();
+		if (!out)
+		{
+			fail(path, "could not write file");
+		}
+	}
+
+	// Dates are stored as M/D/YYYY, or "Not set"
+	string normalizeDate(const string& date)
+	{
+		string text = trim(date);
+		string lower = text;
+		transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) { return static_cast<char>(tolower(c)); });
+		if (text.empty() || lower == "not set")
+		{
+			return kDateNotSet;
+		}
+		return text;
+	}
+
+	void requireNonNegative(double value, const char* what)
+	{
+		if (value < 0 || !isfinite(value))
+		{
+			throw invalid_argument(string(what) + " cannot be negative");
+		}
+	}
+
+	string formatAmount(double value)
+	{
+		ostringstream out;
+		out << value;
+		return out.str();
+	}
+}
+
+string todayString()
+{
+	time_t now = time(nullptr);
+	tm local{};
+	localtime_s(&local, &now);
+	return to_string(local.tm_mon + 1) + "/" + to_string(local.tm_mday) + "/" + to_string(local.tm_year + 1900);
+}
 
 /********************************************************************************************
  *																							*
  *						Implementation for Crop Class										*
  *																							*
  ********************************************************************************************/
-// Constructor
-Crop::Crop() {}
+Crop::Crop(string name)
+	: name(move(name)), growthStatus(kStatusNotPlanted)
+{
+}
+
+const vector<string>& Crop::statuses()
+{
+	static const vector<string> list = {
+		kStatusNotPlanted, "Germination", "Seedling", "Vegetative",
+		"Flowering", "Filling", kStatusMaturity, kStatusHarvested
+	};
+	return list;
+}
 
 // Setter functions
-void Crop::setName(string name)
+void Crop::setVariety(const string& variety)
 {
-	this->name = name;
+	this->variety = variety;
 }
 
 void Crop::setQuantity(double quantity)
 {
-	if (quantity < 0) {
-		throw invalid_argument("Quantity cannot be negative");
-	}
-	Crop::quantity = quantity;
+	requireNonNegative(quantity, "Quantity");
+	this->quantity = quantity;
 }
 
 void Crop::setPrice(double price)
 {
-	if (price < 0) {
-		throw invalid_argument("Price cannot be negative");
-	}
-	Crop::price = price;
+	requireNonNegative(price, "Price");
+	this->price = price;
 }
 
-void Crop::setPlantingDate(string plantingDate)
-{	
-	this->plantingDate = plantingDate;
-}
-
-void Crop::setHarvestingDate(string harvestingDate)
+void Crop::setPlantingDate(const string& plantingDate)
 {
-	this->harvestingDate = harvestingDate;
+	this->plantingDate = normalizeDate(plantingDate);
+}
+
+void Crop::setHarvestingDate(const string& harvestingDate)
+{
+	this->harvestingDate = normalizeDate(harvestingDate);
 }
 
 void Crop::setFieldSize(int fieldSize)
@@ -60,10 +244,16 @@ void Crop::setFieldSize(int fieldSize)
 	}
 	this->fieldSize = fieldSize;
 }
+
 // Getter Functions
-string Crop::getName() const
+const string& Crop::getName() const
 {
 	return name;
+}
+
+const string& Crop::getVariety() const
+{
+	return variety;
 }
 
 double Crop::getQuantity() const
@@ -76,12 +266,12 @@ double Crop::getPrice() const
 	return price;
 }
 
-string Crop::getPlantingDate() const
+const string& Crop::getPlantingDate() const
 {
 	return plantingDate;
 }
 
-string Crop::getHarvestingDate() const
+const string& Crop::getHarvestingDate() const
 {
 	return harvestingDate;
 }
@@ -91,54 +281,41 @@ int Crop::getFieldSize() const
 	return fieldSize;
 }
 
-string Crop::getGrowthStatus() const
+const string& Crop::getGrowthStatus() const
 {
 	return growthStatus;
 }
 
-
-// Function to advance the growth status
-// The growth statuses in order are
-// Germination, Seedling, Vegetative,
-// Flowering, Filling, Maturity
-void Crop::advanceStatus()
+bool Crop::isMature() const
 {
-	if (growthStatus == "Not Planted") 
-	{
-		growthStatus = "Germination";
-	}
-	else if (growthStatus == "Germination") 
-	{
-		growthStatus = "Seedling";
-	}
-	else if (growthStatus == "Seedling") 
-	{
-		growthStatus = "Vegetative";
-	}
-	else if (growthStatus == "Vegetative")
-	{
-		growthStatus = "Flowering";
-	}
-	else if (growthStatus == "Flowering")
-	{
-		growthStatus = "Filling";
-	}
-	else if (growthStatus == "Filling")
-	{
-		growthStatus = "Maturity";
-	}
+	return growthStatus == kStatusMaturity;
 }
 
-// Function to update quantity i.e. add or remove some amount
-void Crop::updateQuantity(double amount)
+bool Crop::isHarvested() const
 {
-	quantity += amount;
+	return growthStatus == kStatusHarvested;
 }
 
-// Function to update price i.e. add or remove
-void Crop::updatePrice(double amount)
+bool Crop::advanceStatus()
 {
-	price += amount;
+	const vector<string>& list = statuses();
+	auto current = find(list.begin(), list.end(), growthStatus);
+	auto maturity = find(list.begin(), list.end(), kStatusMaturity);
+	if (current == list.end() || current >= maturity)
+	{
+		return false;
+	}
+	growthStatus = *(current + 1);
+	return true;
+}
+
+double Crop::harvestableQuantity() const
+{
+	if (quantity > 0)
+	{
+		return quantity;
+	}
+	return calculateYield() * fieldSize;
 }
 
 // Calculates and returns revenue
@@ -147,99 +324,109 @@ double Crop::calculateRevenue() const
 	return quantity * price;
 }
 
-// Get Crop Yield after harvest
-double Crop::getTotalYield() const
-{
-	return quantity / fieldSize;
-}
-
-// Calculates and returns Yield  
-double Crop::calculateYield() const
-{
-	return quantity / fieldSize;
-}
-
 // record any pest infestations
-void Crop::recordPestInfestation(string date, string description)
+void Crop::recordPestInfestation(const string& date, const string& description) const
 {
-	file.open("data/Pest Infestation record.txt", ios::app);
-	if (!file.is_open())
+	if (trim(description).empty())
 	{
-		throw "Unable to Open File!";
+		throw invalid_argument("Please describe the pest infestation");
 	}
-	file << "Crop: " << name << endl;
-	file << "Date: " << date << endl;
-	file << "Description: " << description << endl << endl;
-	file.close();
+	appendRecord("data/Pest Infestation record.txt", name, date, "Description: " + description);
 }
 
 // record any disease outbreaks
-void Crop::recordDiseaseOutbreak(string date, string description)
+void Crop::recordDiseaseOutbreak(const string& date, const string& description) const
 {
-	file.open("data/Crop Disease record.txt", ios::app);
-	if (!file.is_open())
+	if (trim(description).empty())
 	{
-		throw "Unable to Open File!";
+		throw invalid_argument("Please describe the disease outbreak");
 	}
-	file << "Crop: " << name << endl;
-	file << "Date: " << date << endl;
-	file << "Description: " << description << endl << endl;
-	file.close();
+	appendRecord("data/Crop Disease record.txt", name, date, "Description: " + description);
 }
 
-
-// Water crop and record it
-void Crop::recordCropWatering(string date, double water)
+// Water crop from the storage and record it
+void Crop::recordCropWatering(Harvest& storage, const string& date, double water) const
 {
-	if (growthStatus == "Maturity")
+	if (isMature() || isHarvested())
 	{
-		throw "Crop has already matured!";
+		throw invalid_argument(name + " has already matured");
 	}
-	if (Harvest::water < water)
+	if (!(water > 0))
 	{
-		throw "Insufficient water!";
+		throw invalid_argument("Amount of water must be more than zero");
 	}
-	file.open("data/Crop Watering record.txt", ios::app);
-	if (!file.is_open())
+	if (storage.water < water)
 	{
-		throw "Unable to Open File!";
+		throw invalid_argument("Not enough water in storage (" + formatAmount(storage.water) + " litres left)");
 	}
-	file << "Crop: " << name << endl;
-	file << "Date: " << date << endl;
-	file << "Amount of water used: " << to_string(water) << endl << endl;
-	file.close();
+	appendRecord("data/Crop Watering record.txt", name, date, "Amount of water used: " + formatAmount(water) + " litres");
+	storage.water -= water;
 }
 
-// Function to fertilize crop and record it
-void Crop::recordFertilization(string date, double fertilizer)
+// Fertilize crop from the storage and record it
+void Crop::recordFertilization(Harvest& storage, const string& date, double fertilizer) const
 {
-	if (growthStatus == "Maturity")
+	if (isMature() || isHarvested())
 	{
-		throw "Crop has already matured!";
+		throw invalid_argument(name + " has already matured");
 	}
-	if (Harvest::fertilizer < fertilizer)
+	if (!(fertilizer > 0))
 	{
-		throw "Insufficient fertilizer!";
+		throw invalid_argument("Amount of fertilizer must be more than zero");
 	}
-	file.open("data/Crop Fertilization record.txt", ios::app);
-	if (!file.is_open())
+	if (storage.fertilizer < fertilizer)
 	{
-		throw "Unable to Open File!";
+		throw invalid_argument("Not enough fertilizer in storage (" + formatAmount(storage.fertilizer) + " kg left)");
 	}
-	file << "Crop: " << name << endl;
-	file << "Date: " << date << endl;
-	file << "Amount of fertilizer used: " << to_string(fertilizer) << endl << endl;
-	file.close();
+	appendRecord("data/Crop Fertilization record.txt", name, date, "Amount of fertilizer used: " + formatAmount(fertilizer) + " kg");
+	storage.fertilizer -= fertilizer;
 }
 
 // Function to reset the Crop for new season
 void Crop::startNewSeason()
 {
-	growthStatus = "Not Planted";
+	growthStatus = kStatusNotPlanted;
 	fieldSize = 0;
 	quantity = 0;
-	plantingDate = "Not set";
-	harvestingDate = "Not set";
+	plantingDate = kDateNotSet;
+	harvestingDate = kDateNotSet;
+}
+
+string Crop::dataFile() const
+{
+	return "data/" + name + ".txt";
+}
+
+// File order: variety, field size, quantity, price, status, planting date, harvesting date
+void Crop::loadCommon(istream& in, const string& path, int& line)
+{
+	variety = readLine(in, path, line);
+	int size = readInt(in, path, line);
+	applyValue(path, line, [&] { setFieldSize(size); });
+	double amount = readDouble(in, path, line);
+	applyValue(path, line, [&] { setQuantity(amount); });
+	double cost = readDouble(in, path, line);
+	applyValue(path, line, [&] { setPrice(cost); });
+	string status = readLine(in, path, line);
+	const vector<string>& list = statuses();
+	if (find(list.begin(), list.end(), status) == list.end())
+	{
+		fail(path, "line " + to_string(line) + " is not a growth status: \"" + status + "\"");
+	}
+	growthStatus = status;
+	setPlantingDate(readLine(in, path, line));
+	setHarvestingDate(readLine(in, path, line));
+}
+
+void Crop::saveCommon(ostream& out) const
+{
+	out << variety << '\n';
+	out << fieldSize << '\n';
+	out << quantity << '\n';
+	out << price << '\n';
+	out << growthStatus << '\n';
+	out << plantingDate << '\n';
+	out << harvestingDate << '\n';
 }
 
 /********************************************************************************************
@@ -247,40 +434,7 @@ void Crop::startNewSeason()
  *						Implementation for Wheat Class										*
  *																							*
  ********************************************************************************************/
-// Constructor
-Wheat::Wheat() {
-	name = "Wheat";
-	// Load all data
-	file.open("data/Wheat.txt", ios::in);
-	if (!file.is_open())
-	{
-		throw "Unable to open file!";
-	}
-	getline(file, buffer);
-	setWheatType(buffer);
-	getline(file, buffer);
-	setFieldSize(stoi(buffer));
-	getline(file, buffer);
-	setQuantity(stod(buffer));
-	getline(file, buffer); 
-	setPrice(stod(buffer));
-	getline(file, buffer);
-	growthStatus = buffer;
-	getline(file, buffer);
-	setPlantingDate(buffer);
-	getline(file, buffer);
-	setHarvestingDate(buffer);
-	getline(file, buffer);
-	setHeadsPerYard(stoi(buffer));
-	getline(file, buffer);
-	setHeadWeight(stod(buffer));
-	file.close();
-}
-// setter functions
-void Wheat::setWheatType(string wheatType)
-{
-	this->wheatType = wheatType;
-}
+Wheat::Wheat() : Crop("Wheat") {}
 
 void Wheat::setHeadsPerYard(int headsPerYard) {
 	if (headsPerYard < 0) {
@@ -290,17 +444,8 @@ void Wheat::setHeadsPerYard(int headsPerYard) {
 }
 
 void Wheat::setHeadWeight(double headWeight) {
-	if (headWeight < 0.0) {
-		throw invalid_argument("Head weight cannot be negative");
-	}
+	requireNonNegative(headWeight, "Head weight");
 	this->headWeight = headWeight;
-}
-
-
-// Getter functions
-string Wheat::getWheatType() const
-{
-	return wheatType;
 }
 
 int Wheat::getHeadsPerYard() const
@@ -313,14 +458,12 @@ double Wheat::getHeadWeight() const
 	return headWeight;
 }
 
-
-// Function to calculate yield in tonnes per acre
+// Yield in tonnes per acre: grams per square yard, times 4840 square yards per acre
 double Wheat::calculateYield() const
 {
-	return (headsPerYard * headWeight * 0.00002246) / 0.907;
+	return headsPerYard * headWeight * 4840.0 / 1e6;
 }
 
-// Overridden function of startNewSeason
 void Wheat::startNewSeason()
 {
 	Crop::startNewSeason();
@@ -328,26 +471,26 @@ void Wheat::startNewSeason()
 	headsPerYard = 0;
 }
 
-// Destructor for saving data
-Wheat::~Wheat()
+void Wheat::load()
 {
-	// open file
-	file.open("data/Wheat.txt", ios::out);
-	if (!file.is_open())
-	{
-		throw "Unable to open file!";
-	}
-	// Input data
-	file << wheatType << endl;
-	file << fieldSize << endl;
-	file << quantity << endl;
-	file << price << endl;
-	file << growthStatus << endl;
-	file << plantingDate << endl;
-	file << harvestingDate << endl;
-	file << headsPerYard << endl;
-	file << headWeight << endl;
-	file.close();
+	const string path = dataFile();
+	ifstream in = openForReading(path);
+	int line = 0;
+	loadCommon(in, path, line);
+	int heads = readInt(in, path, line);
+	applyValue(path, line, [&] { setHeadsPerYard(heads); });
+	double weight = readDouble(in, path, line);
+	applyValue(path, line, [&] { setHeadWeight(weight); });
+}
+
+void Wheat::save() const
+{
+	const string path = dataFile();
+	ofstream out = openForWriting(path);
+	saveCommon(out);
+	out << headsPerYard << '\n';
+	out << headWeight << '\n';
+	finishWriting(out, path);
 }
 
 /********************************************************************************************
@@ -355,46 +498,7 @@ Wheat::~Wheat()
  *						Implementation for Corn Class										*
  *																							*
  ********************************************************************************************/
- // Constructor
-Corn::Corn()
-{
-	name = "Corn";
-	// Load all data
-	file.open("data/Corn.txt", ios::in);
-	if (!file.is_open())
-	{
-		throw "Unable to open file!";
-	}
-	getline(file, buffer);
-	setCornType(buffer);
-	getline(file, buffer);
-	setFieldSize(stoi(buffer));
-	getline(file, buffer);
-	setQuantity(stod(buffer));
-	getline(file, buffer);
-	setPrice(stod(buffer));
-	getline(file, buffer);
-	growthStatus = buffer;
-	getline(file, buffer);
-	setPlantingDate(buffer);
-	getline(file, buffer);
-	setHarvestingDate(buffer);
-	getline(file, buffer);
-	setEarsPerAcre(stoi(buffer));
-	getline(file, buffer);
-	setEarWeight(stod(buffer));
-	getline(file, buffer);
-	setKernalsPerEar(stoi(buffer));
-	getline(file, buffer);
-	setShrinkage(stoi(buffer));
-	file.close();
-}
-
-// Setter functions
-void Corn::setCornType(string cornType)
-{
-	this->cornType = cornType;
-}
+Corn::Corn() : Crop("Corn") {}
 
 void Corn::setEarsPerAcre(int earsPerAcre) {
 	if (earsPerAcre < 0) {
@@ -403,31 +507,23 @@ void Corn::setEarsPerAcre(int earsPerAcre) {
 	this->earsPerAcre = earsPerAcre;
 }
 
-void Corn::setKernalsPerEar(int kernalsPerEar) {
-	if (kernalsPerEar < 0) {
-		throw invalid_argument("Kernals per ear cannot be negative");
+void Corn::setKernelsPerEar(int kernelsPerEar) {
+	if (kernelsPerEar < 0) {
+		throw invalid_argument("Kernels per ear cannot be negative");
 	}
-	this->kernalsPerEar = kernalsPerEar;
+	this->kernelsPerEar = kernelsPerEar;
 }
 
-void Corn::setEarWeight(double earWeight) {
-	if (earWeight < 0.0) {
-		throw invalid_argument("Ear weight cannot be negative");
-	}
-	this->earWeight = earWeight;
+void Corn::setKernelWeight(double kernelWeight) {
+	requireNonNegative(kernelWeight, "Kernel weight");
+	this->kernelWeight = kernelWeight;
 }
 
 void Corn::setShrinkage(int shrinkage) {
-	if (shrinkage < 0) {
-		throw invalid_argument("Shrinkage cannot be negative");
+	if (shrinkage < 0 || shrinkage > 99) {
+		throw invalid_argument("Shrinkage must be between 0 and 99 percent");
 	}
 	this->shrinkage = shrinkage;
-}
-
-// Getter functions
-string Corn::getCornType() const
-{
-	return cornType;
 }
 
 int Corn::getEarsPerAcre() const
@@ -435,14 +531,14 @@ int Corn::getEarsPerAcre() const
 	return earsPerAcre;
 }
 
-int Corn::getKernalsPerEar() const
+int Corn::getKernelsPerEar() const
 {
-	return kernalsPerEar;
+	return kernelsPerEar;
 }
 
-double Corn::getEarWeight() const
+double Corn::getKernelWeight() const
 {
-	return earWeight;
+	return kernelWeight;
 }
 
 int Corn::getShrinkage() const
@@ -450,44 +546,48 @@ int Corn::getShrinkage() const
 	return shrinkage;
 }
 
-// Function to calculate yield in tonnes per acre
+// Yield in tonnes per acre, less the weight lost to shrinkage
 double Corn::calculateYield() const
 {
-	return (earsPerAcre * kernalsPerEar * earWeight * 0.0254) / (1000 * (1 - shrinkage * 0.01));
+	return static_cast<double>(earsPerAcre) * kernelsPerEar * kernelWeight / 1e6 * (1 - shrinkage / 100.0);
 }
 
-// Overridden function of startNewSeason
 void Corn::startNewSeason()
 {
 	Crop::startNewSeason();
 	earsPerAcre = 0;
-	kernalsPerEar = 0;
-	earWeight = 0;
+	kernelsPerEar = 0;
+	kernelWeight = 0;
 	shrinkage = 0;
 }
 
-// Destructor for saving data
-Corn::~Corn()
+// File order after the common fields: ears per acre, kernel weight, kernels per ear, shrinkage
+void Corn::load()
 {
-	// open file
-	file.open("data/Corn.txt", ios::out);
-	if (!file.is_open())
-	{
-		throw "Unable to open file!";
-	}
-	// Input data
-	file << cornType << endl;
-	file << fieldSize << endl;
-	file << quantity << endl;
-	file << price << endl;
-	file << growthStatus << endl;
-	file << plantingDate << endl;
-	file << harvestingDate << endl;
-	file << earsPerAcre << endl;
-	file << earWeight << endl;
-	file << kernalsPerEar << endl;
-	file << shrinkage << endl;
-	file.close();
+	const string path = dataFile();
+	ifstream in = openForReading(path);
+	int line = 0;
+	loadCommon(in, path, line);
+	int ears = readInt(in, path, line);
+	applyValue(path, line, [&] { setEarsPerAcre(ears); });
+	double weight = readDouble(in, path, line);
+	applyValue(path, line, [&] { setKernelWeight(weight); });
+	int kernels = readInt(in, path, line);
+	applyValue(path, line, [&] { setKernelsPerEar(kernels); });
+	int shrink = readInt(in, path, line);
+	applyValue(path, line, [&] { setShrinkage(shrink); });
+}
+
+void Corn::save() const
+{
+	const string path = dataFile();
+	ofstream out = openForWriting(path);
+	saveCommon(out);
+	out << earsPerAcre << '\n';
+	out << kernelWeight << '\n';
+	out << kernelsPerEar << '\n';
+	out << shrinkage << '\n';
+	finishWriting(out, path);
 }
 
 /********************************************************************************************
@@ -495,48 +595,11 @@ Corn::~Corn()
  *						Implementation for Rice Class										*
  *																							*
  ********************************************************************************************/
- // Constructor
-Rice::Rice()
-{
-	name = "Rice";
-	// Load all data
-	file.open("data/Rice.txt", ios::in);
-	if (!file.is_open())
-	{
-		throw "Unable to open file!";
-	}
-	getline(file, buffer);
-	setRiceType(buffer);
-	getline(file, buffer);
-	setFieldSize(stoi(buffer));
-	getline(file, buffer);
-	setQuantity(stod(buffer));
-	getline(file, buffer);
-	setPrice(stod(buffer));
-	getline(file, buffer);
-	growthStatus = buffer;
-	getline(file, buffer);
-	setPlantingDate(buffer);
-	getline(file, buffer);
-	setHarvestingDate(buffer);
-	getline(file, buffer);
-	setNumPaniclesPerM2(stoi(buffer));
-	getline(file, buffer);
-	setGrainsPerPanicle(stoi(buffer));
-	getline(file, buffer);
-	setGrainWeight(stod(buffer));
-	file.close();
-}
-
-// setter functions
-void Rice::setRiceType(string riceType)
-{
-	this->riceType = riceType;
-}
+Rice::Rice() : Crop("Rice") {}
 
 void Rice::setNumPaniclesPerM2(int numPaniclesPerM2) {
 	if (numPaniclesPerM2 < 0) {
-		throw invalid_argument("Number of panicles per square meter cannot be negative");
+		throw invalid_argument("Panicles per square metre cannot be negative");
 	}
 	this->numPaniclesPerM2 = numPaniclesPerM2;
 }
@@ -549,16 +612,8 @@ void Rice::setGrainsPerPanicle(int grainsPerPanicle) {
 }
 
 void Rice::setGrainWeight(double grainWeight) {
-	if (grainWeight < 0.0) {
-		throw invalid_argument("Grain weight cannot be negative");
-	}
+	requireNonNegative(grainWeight, "Grain weight");
 	this->grainWeight = grainWeight;
-}
-
-// Getter functions
-string Rice::getRiceType() const
-{
-	return riceType;
 }
 
 int Rice::getNumPaniclesPerM2() const
@@ -576,13 +631,12 @@ double Rice::getGrainWeight() const
 	return grainWeight;
 }
 
-// Function to calculate yield in tonnes per acre
+// Yield in tonnes per acre: grams per square metre, times 4046.86 square metres per acre
 double Rice::calculateYield() const
 {
-	return (numPaniclesPerM2 * grainsPerPanicle * grainWeight) / 40.47;
+	return static_cast<double>(numPaniclesPerM2) * grainsPerPanicle * grainWeight * 4046.86 / 1e6;
 }
 
-// Overridden function of startNewSeason
 void Rice::startNewSeason()
 {
 	Crop::startNewSeason();
@@ -591,27 +645,29 @@ void Rice::startNewSeason()
 	grainWeight = 0;
 }
 
-// Destructor for saving data
-Rice::~Rice()
+void Rice::load()
 {
-	// open file
-	file.open("data/Rice.txt", ios::out);
-	if (!file.is_open())
-	{
-		throw "Unable to open file!";
-	}
-	// Input data
-	file << riceType << endl;
-	file << fieldSize << endl;
-	file << quantity << endl;
-	file << price << endl;
-	file << growthStatus << endl;
-	file << plantingDate << endl;
-	file << harvestingDate << endl;
-	file << numPaniclesPerM2 << endl;
-	file << grainsPerPanicle << endl;
-	file << grainWeight << endl;
-	file.close();
+	const string path = dataFile();
+	ifstream in = openForReading(path);
+	int line = 0;
+	loadCommon(in, path, line);
+	int panicles = readInt(in, path, line);
+	applyValue(path, line, [&] { setNumPaniclesPerM2(panicles); });
+	int grains = readInt(in, path, line);
+	applyValue(path, line, [&] { setGrainsPerPanicle(grains); });
+	double weight = readDouble(in, path, line);
+	applyValue(path, line, [&] { setGrainWeight(weight); });
+}
+
+void Rice::save() const
+{
+	const string path = dataFile();
+	ofstream out = openForWriting(path);
+	saveCommon(out);
+	out << numPaniclesPerM2 << '\n';
+	out << grainsPerPanicle << '\n';
+	out << grainWeight << '\n';
+	finishWriting(out, path);
 }
 
 /********************************************************************************************
@@ -619,111 +675,36 @@ Rice::~Rice()
  *						Implementation for Harvest Class								    *
  *																							*
  ********************************************************************************************/
-
-// initialization of static members
-double Harvest::water = 0;
-double Harvest::fertilizer = 0;
-
-
-// Constructor
-Harvest::Harvest()
-{
-	// open file
-	file.open("data/Harvest.txt", ios::in);
-	if (!file.is_open())
-	{
-		throw "Unable to open file!";
-	}
-	// load all data
-	getline(file, buffer);
-	setFertilizer(stod(buffer));
-	getline(file, buffer);
-	setWater(stod(buffer));
-	getline(file, buffer);
-	setPriceFertilizer(stod(buffer));
-	getline(file, buffer);
-	setPriceWater(stod(buffer));
-	getline(file, buffer);
-	amountRice = stod(buffer);
-	getline(file, buffer);
-	amountCorn = stod(buffer);
-	getline(file, buffer);
-	amountWheat = stod(buffer);
-	getline(file, buffer);
-	revenue = stod(buffer);
-	file.close();
-}
-
-//setter functions
-
 void Harvest::setFertilizer(double amount)
 {
-	if (amount < 0) {
-		throw std::invalid_argument("Fertilizer quantity cannot be negative");
-	}
+	requireNonNegative(amount, "Fertilizer quantity");
 	fertilizer = amount;
 }
 
 void Harvest::setWater(double amount)
 {
-	if (amount < 0) {
-		throw std::invalid_argument("Water quantity cannot be negative");
-	}
+	requireNonNegative(amount, "Water quantity");
 	water = amount;
 }
 
 void Harvest::setPriceFertilizer(double price)
 {
-	if (price < 0) {
-		throw std::invalid_argument("Fertilizer price cannot be negative");
-	}
+	requireNonNegative(price, "Fertilizer price");
 	priceFertilizer = price;
 }
 
 void Harvest::setPriceWater(double price)
 {
-	if (price < 0) {
-		throw std::invalid_argument("Water price cannot be negative");
-	}
+	requireNonNegative(price, "Water price");
 	priceWater = price;
 }
 
-void Harvest::setAmountRice(double value) {
-	if (value < 0) {
-		throw std::invalid_argument("Amount of rice cannot be negative.");
-	}
-	amountRice = value;
-}
-
-void Harvest::setAmountWheat(double value) {
-	if (value < 0) {
-		throw std::invalid_argument("Amount of wheat cannot be negative.");
-	}
-	amountWheat = value;
-}
-
-void Harvest::setAmountCorn(double value) {
-	if (value < 0) {
-		throw std::invalid_argument("Amount of corn cannot be negative.");
-	}
-	amountCorn = value;
-}
-
-void Harvest::setRevenue(double value) {
-	if (value < 0) {
-		throw std::invalid_argument("Revenue cannot be negative.");
-	}
-	revenue = value;
-}
-
-
-// getter functions
-double Harvest::getFertilizer()
+double Harvest::getFertilizer() const
 {
 	return fertilizer;
 }
 
-double Harvest::getWater()
+double Harvest::getWater() const
 {
 	return water;
 }
@@ -758,62 +739,75 @@ double Harvest::getRevenue() const
 	return revenue;
 }
 
-// Function to update amount of water
-void Harvest::updateWater(double amount)
+vector<string> Harvest::harvestAndStore(Wheat& wheat, Corn& corn, Rice& rice)
 {
-	water += amount;
+	vector<string> harvested;
+	auto collect = [&](Crop& crop, double& store) {
+		if (!crop.isMature())
+		{
+			return;
+		}
+		store += crop.harvestableQuantity();
+		crop.quantity = 0;
+		crop.growthStatus = kStatusHarvested;
+		if (crop.harvestingDate == kDateNotSet)
+		{
+			crop.harvestingDate = todayString();
+		}
+		harvested.push_back(crop.name);
+	};
+	collect(wheat, amountWheat);
+	collect(corn, amountCorn);
+	collect(rice, amountRice);
+	return harvested;
 }
 
-// Function to update amount of fertilizer
-void Harvest::updateFertilizer(double amount)
+double Harvest::sellAndGenerateRevenue(const Wheat& wheat, const Corn& corn, const Rice& rice)
 {
-	fertilizer += amount;
-}
-
-// Function to store the harvested crop
-void Harvest::harvestAndStore()
-{
-	// Store the harvested amounts
-	amountWheat += Wheat::quantity;
-	amountCorn += Corn::quantity;
-	amountRice += Rice::quantity;
-	Rice::setQuantity(0);
-	Wheat::setQuantity(0);
-	Corn::setQuantity(0);
-}
-
-//Function to sell all harvested crops and return the revenue
-void Harvest::SellAndGenerateRevenue()
-{
-	// Calculate revenue for each crop
-	double cornRevenue = amountCorn * Corn::price;
-	double wheatRevenue = amountWheat * Wheat::price;
-	double riceRevenue = amountRice * Rice::price;
-	// Sum the revenues
-	revenue += cornRevenue + wheatRevenue + riceRevenue;
-	// Reset the harvested amounts to zero
+	double earned = amountWheat * wheat.price + amountCorn * corn.price + amountRice * rice.price;
+	revenue += earned;
 	amountCorn = 0;
 	amountWheat = 0;
 	amountRice = 0;
+	return earned;
 }
 
-// Destructor to save data
-Harvest::~Harvest()
+// File order: fertilizer, water, fertilizer price, water price, rice, corn, wheat, revenue
+void Harvest::load()
 {
-	// Open file
-	file.open("data/Harvest.txt", ios::out);
-	if (!file.is_open())
+	const string path = "data/Harvest.txt";
+	ifstream in = openForReading(path);
+	int line = 0;
+	double values[8];
+	for (double& value : values)
 	{
-		throw "Unable to open file!";
+		value = readDouble(in, path, line);
+		if (value < 0)
+		{
+			fail(path, "line " + to_string(line) + " cannot be negative");
+		}
 	}
-	// Save data
-	file << fertilizer << endl;
-	file << water << endl;
-	file << priceFertilizer << endl;
-	file << priceWater << endl;
-	file << amountRice << endl;
-	file << amountCorn << endl;
-	file << amountWheat << endl;
-	file << revenue << endl;
-	file.close();
+	fertilizer = values[0];
+	water = values[1];
+	priceFertilizer = values[2];
+	priceWater = values[3];
+	amountRice = values[4];
+	amountCorn = values[5];
+	amountWheat = values[6];
+	revenue = values[7];
+}
+
+void Harvest::save() const
+{
+	const string path = "data/Harvest.txt";
+	ofstream out = openForWriting(path);
+	out << fertilizer << '\n';
+	out << water << '\n';
+	out << priceFertilizer << '\n';
+	out << priceWater << '\n';
+	out << amountRice << '\n';
+	out << amountCorn << '\n';
+	out << amountWheat << '\n';
+	out << revenue << '\n';
+	finishWriting(out, path);
 }

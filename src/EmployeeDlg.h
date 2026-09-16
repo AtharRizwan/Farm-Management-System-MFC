@@ -1,29 +1,42 @@
 #pragma once
-#include "afxdialogex.h"
 #include <vector>
+#include "UiTheme.h"
 
-// EmployeeDlg dialog
+class Employee;
 
-class EmployeeDlg : public CDialog
+// Employees dialog: list, add, update and remove employees
+class EmployeeDlg : public ThemedDialog
 {
-	DECLARE_DYNAMIC(EmployeeDlg);
-		CBrush m_backgroundBrush;
+	DECLARE_DYNAMIC(EmployeeDlg)
+
 public:
-	virtual BOOL OnInitDialog();
 	EmployeeDlg(CWnd* pParent = nullptr);   // standard constructor
-	virtual ~EmployeeDlg();
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_DIALOG3 };
+	enum { IDD = IDD_EMPLOYEES };
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
+	void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
+	BOOL OnInitDialog() override;
+	void OnOK() override;
 	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedbtnaddemployee();
-	CListBox EmpData;
-	afx_msg void OnBnClickedbtnaddemployee2();
+
+	afx_msg void OnAdd();
+	afx_msg void OnUpdate();
+	afx_msg void OnRemove();
+	afx_msg void OnClear();
+	afx_msg void OnSelectionChanged(NMHDR* pNMHDR, LRESULT* pResult);
+
+private:
+	void FillList(int select = -1);
+	int SelectedIndex() const;
+	void UpdateButtons();
+	// Builds an employee from the form, or shows an error and returns false
+	bool ReadForm(std::vector<Employee>& employees, int index);
+	// Saves the new list; on success it replaces the app's list
+	bool Save(const std::vector<Employee>& employees);
+
+	CListCtrl m_list;
 };

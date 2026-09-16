@@ -3,197 +3,252 @@
 
 #include "pch.h"
 #include "Farm Management System MFC.h"
-#include "afxdialogex.h"
 #include "EmployeeDlg.h"
 #include "employee.h"
-#include <vector>
-#include <fstream>
-#include <string>
-using namespace std;
-
-std::vector <Employee> employees;
-// Load all employees into this vector
+#include <stdexcept>
 
 
 // EmployeeDlg dialog
 
-IMPLEMENT_DYNAMIC(EmployeeDlg, CDialog)
-
-
-HBRUSH EmployeeDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) {
-	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
-
-	// Check if the control is the dialog itself
-	if (pWnd == this) {
-		// Set the background color of the dialog
-		pDC->SetBkColor(RGB(104, 166, 145));  // Set your desired background color here
-		hbr = m_backgroundBrush;
-	}
-
-	return hbr;
-}
-
-
-BOOL EmployeeDlg::OnInitDialog()
-{
-	// Call the base class implementation
-	BOOL bResult = CDialog::OnInitDialog();
-	string buffer;
-	std::fstream file;
-	// Perform your desired task here
-	m_backgroundBrush.CreateSolidBrush(RGB(104, 166, 145));
-	try
-	{
-		file.open("data/Employee.txt", std::ios::in | std::ios::binary);
-		if (!file.is_open())
-		{
-			throw "Unable to open file";
-		}
-		// Load employee data
-		while (file)
-		{
-			std::string name;
-			int age;
-			double salary;
-			file >> name;
-			file >> buffer;
-			age = stoi(buffer);
-			file >> buffer;
-			salary = stod(buffer);
-			buffer.clear();
-			Employee employee(name, age, salary);
-			employees.push_back(employee);
-
-			CStringA dataStringA(employee.getName().c_str());
-			CString dataString(dataStringA);
-
-			dataString.AppendFormat(_T(", Age: %d, Salary: %.2f"), employee.getAge(), employee.getSalary());
-			EmpData.AddString(dataString); // Add the data string to the list box
-		}
-		file.close();
-	}
-	catch (...)
-	{
-		AfxMessageBox(L"Opened!");
-	}
-
-	
-	// Return the result
-	return bResult;
-}
+IMPLEMENT_DYNAMIC(EmployeeDlg, ThemedDialog)
 
 EmployeeDlg::EmployeeDlg(CWnd* pParent /*=nullptr*/)
-	: CDialog(IDD_DIALOG3, pParent)
-{
-
-}
-
-EmployeeDlg::~EmployeeDlg()
+	: ThemedDialog(IDD_EMPLOYEES, pParent)
 {
 }
 
 void EmployeeDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, listEmpData, EmpData);
+	ThemedDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EMPLOYEE_LIST, m_list);
 }
 
 
-BEGIN_MESSAGE_MAP(EmployeeDlg, CDialog)
-	ON_WM_CTLCOLOR()
-	ON_BN_CLICKED(btnAddEmployee, &EmployeeDlg::OnBnClickedbtnaddemployee)
-	ON_BN_CLICKED(btnAddEmployee2, &EmployeeDlg::OnBnClickedbtnaddemployee2)
+BEGIN_MESSAGE_MAP(EmployeeDlg, ThemedDialog)
+	ON_BN_CLICKED(IDC_EMP_ADD, &EmployeeDlg::OnAdd)
+	ON_BN_CLICKED(IDC_EMP_UPDATE, &EmployeeDlg::OnUpdate)
+	ON_BN_CLICKED(IDC_EMP_REMOVE, &EmployeeDlg::OnRemove)
+	ON_BN_CLICKED(IDC_EMP_CLEAR, &EmployeeDlg::OnClear)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_EMPLOYEE_LIST, &EmployeeDlg::OnSelectionChanged)
 END_MESSAGE_MAP()
 
 
 // EmployeeDlg message handlers
 
-
-void EmployeeDlg::OnBnClickedbtnaddemployee()
+BOOL EmployeeDlg::OnInitDialog()
 {
-	// TODO: Add your control notification handler code here
-	string buffer;
-	std::fstream file;
+	ThemedDialog::OnInitDialog();
+
+	m_list.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_DOUBLEBUFFER);
+	CRect rect;
+	m_list.GetClientRect(&rect);
+	int width = rect.Width();
+	m_list.InsertColumn(0, _T("Name"), LVCFMT_LEFT, width * 50 / 100);
+	m_list.InsertColumn(1, _T("Age"), LVCFMT_RIGHT, width * 15 / 100);
+	m_list.InsertColumn(2, _T("Salary (Rs.)"), LVCFMT_RIGHT, width - width * 50 / 100 - width * 15 / 100);
+
+	SendDlgItemMessage(IDC_EMP_NAME, EM_SETLIMITTEXT, 60);
+	SendDlgItemMessage(IDC_EMP_AGE, EM_SETLIMITTEXT, 3);
+	SendDlgItemMessage(IDC_EMP_SALARY, EM_SETLIMITTEXT, 15);
+
+	FillList();
+	GotoDlgCtrl(GetDlgItem(IDC_EMP_NAME));
+	return FALSE;  // focus was set to a control
+}
+
+void EmployeeDlg::FillList(int select)
+{
+	const std::vector<Employee>& employees = GetFarm().employees;
+	m_list.SetRedraw(FALSE);
+	m_list.DeleteAllItems();
+	for (int i = 0; i < static_cast<int>(employees.size()); ++i)
+	{
+		const Employee& employee = employees[i];
+		m_list.InsertItem(i, ToCString(employee.getName()));
+		CString age;
+		age.Format(_T("%d"), employee.getAge());
+		m_list.SetItemText(i, 1, age);
+		m_list.SetItemText(i, 2, FormatMoney(employee.getSalary()));
+	}
+	if (select >= 0 && select < m_list.GetItemCount())
+	{
+		m_list.SetItemState(select, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+		m_list.EnsureVisible(select, FALSE);
+	}
+	m_list.SetRedraw(TRUE);
+	m_list.Invalidate();
+
+	CString count;
+	count.Format(employees.size() == 1 ? _T("%d employee") : _T("%d employees"), static_cast<int>(employees.size()));
+	SetDlgItemText(IDC_SUBTITLE, count);
+	UpdateButtons();
+}
+
+int EmployeeDlg::SelectedIndex() const
+{
+	return m_list.GetNextItem(-1, LVNI_SELECTED);
+}
+
+void EmployeeDlg::UpdateButtons()
+{
+	bool selected = SelectedIndex() >= 0;
+	GetDlgItem(IDC_EMP_UPDATE)->EnableWindow(selected);
+	GetDlgItem(IDC_EMP_REMOVE)->EnableWindow(selected);
+}
+
+void EmployeeDlg::OnSelectionChanged(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMLISTVIEW change = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	*pResult = 0;
+	if (!(change->uChanged & LVIF_STATE) || ((change->uNewState ^ change->uOldState) & LVIS_SELECTED) == 0)
+	{
+		return;
+	}
+	int index = SelectedIndex();
+	const std::vector<Employee>& employees = GetFarm().employees;
+	if (index >= 0 && index < static_cast<int>(employees.size()))
+	{
+		const Employee& employee = employees[index];
+		SetDlgItemText(IDC_EMP_NAME, ToCString(employee.getName()));
+		SetDlgItemInt(IDC_EMP_AGE, employee.getAge(), FALSE);
+		SetDlgItemText(IDC_EMP_SALARY, FormatNumber(employee.getSalary(), 2));
+		ShowError(_T(""));
+	}
+	UpdateButtons();
+}
+
+bool EmployeeDlg::ReadForm(std::vector<Employee>& employees, int index)
+{
+	CString name;
+	GetDlgItemText(IDC_EMP_NAME, name);
+	name.Trim();
+	int age = 0;
+	double salary = 0;
+	CString error;
+	UINT badControl = 0;
+	if (name.IsEmpty())
+	{
+		error = _T("Name is required.");
+		badControl = IDC_EMP_NAME;
+	}
+	else if (!ReadInt(*this, IDC_EMP_AGE, _T("Age"), age, error))
+	{
+		badControl = IDC_EMP_AGE;
+	}
+	else if (!ReadDouble(*this, IDC_EMP_SALARY, _T("Salary"), salary, error))
+	{
+		badControl = IDC_EMP_SALARY;
+	}
+	else
+	{
+		try
+		{
+			Employee employee(ToUtf8(name), age, salary);
+			if (index < 0)
+			{
+				employees.push_back(employee);
+			}
+			else
+			{
+				employees[index] = employee;
+			}
+			return true;
+		}
+		catch (const std::invalid_argument& e)
+		{
+			error = ToCString(e.what()) + _T(".");
+			badControl = IDC_EMP_AGE;
+		}
+	}
+	ShowError(error);
+	GotoDlgCtrl(GetDlgItem(badControl));
+	return false;
+}
+
+bool EmployeeDlg::Save(const std::vector<Employee>& employees)
+{
+	FarmData& farm = GetFarm();
+	std::vector<Employee> previous = farm.employees;
+	farm.employees = employees;
 	try
 	{
-		file.open("data/Employee.txt", std::ios::app);
-		if (!file.is_open())
-		{
-			throw "Unable to open file";
-		}
-		// Load employee data
-		while (file)
-		{
-			std::string name;
-			int age;
-			double salary;
-			file >> name;
-			file >> buffer;
-			age = stoi(buffer);
-			file >> buffer;
-			salary = stod(buffer);
-			Employee employee(name, age, salary);
-			employees.push_back(employee);
-		}
-		file.close();
+		farm.saveEmployees();
+		return true;
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
-		AfxMessageBox(L"Error!");
+		farm.employees = previous;
+		AfxMessageBox(_T("The employee list could not be saved.\n\n") + ToCString(e.what()), MB_ICONERROR);
+		return false;
 	}
 }
 
-
-void EmployeeDlg::OnBnClickedbtnaddemployee2()
+void EmployeeDlg::OnAdd()
 {
-	CString input;
-	string name;
-	int age;
-	double salary;
-	try
+	std::vector<Employee> employees = GetFarm().employees;
+	if (ReadForm(employees, -1) && Save(employees))
 	{
-		// TODO: Add your control notification handler code here
-		GetDlgItemText(txtName, input);
-		CT2A pszConvertedStringWheat(input);
-		std::string name_(pszConvertedStringWheat);
-		name = name_;
-		GetDlgItemText(txtAge, input);
-		age = (_ttoi(input));
-		GetDlgItemText(txtSalary, input);
-		salary = (_ttof(input));
-		Employee employee(name, age, salary);
-		employees.push_back(employee);
-		string buffer;
-		std::fstream file;
-
-		file.open("data/Employee.txt", std::ios::app);
-		if (!file.is_open())
-		{
-			throw "Unable to open file";
-		}
-		// Add file to employee data
-		file << employee.getName() + " " + to_string(employee.getAge()) + " " + to_string(employee.getSalary()) << endl;
-		file.close();
-
-		file.open("data/Employee.txt", std::ios::in);
-		if (!file.is_open())
-		{
-			throw "Unable to open file";
-		}
-		// Load employee data
-			CStringA dataStringA(employee.getName().c_str());
-			CString dataString(dataStringA);
-
-			dataString.AppendFormat(_T(", Age: %d, Salary: %.2f"), employee.getAge(), employee.getSalary());
-			EmpData.AddString(dataString); // Add the data string to the list box
-		file.close();
-		AfxMessageBox(L"Added Successfully!");
+		FillList(static_cast<int>(employees.size()) - 1);
+		OnClear();
 	}
-	catch (...)
+}
+
+void EmployeeDlg::OnUpdate()
+{
+	int index = SelectedIndex();
+	if (index < 0)
 	{
-		AfxMessageBox(L"Error!");
+		return;
 	}
+	std::vector<Employee> employees = GetFarm().employees;
+	if (ReadForm(employees, index) && Save(employees))
+	{
+		FillList(index);
+	}
+}
 
+void EmployeeDlg::OnRemove()
+{
+	int index = SelectedIndex();
+	std::vector<Employee> employees = GetFarm().employees;
+	if (index < 0 || index >= static_cast<int>(employees.size()))
+	{
+		return;
+	}
+	CString question;
+	question.Format(_T("Remove %s from the employee list?"), (LPCTSTR)ToCString(employees[index].getName()));
+	if (AfxMessageBox(question, MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) != IDYES)
+	{
+		return;
+	}
+	employees.erase(employees.begin() + index);
+	if (Save(employees))
+	{
+		FillList();
+		OnClear();
+	}
+}
 
+void EmployeeDlg::OnClear()
+{
+	m_list.SetItemState(-1, 0, LVIS_SELECTED);
+	SetDlgItemText(IDC_EMP_NAME, _T(""));
+	SetDlgItemText(IDC_EMP_AGE, _T(""));
+	SetDlgItemText(IDC_EMP_SALARY, _T(""));
+	ShowError(_T(""));
+	UpdateButtons();
+	GotoDlgCtrl(GetDlgItem(IDC_EMP_NAME));
+}
 
+// The Enter key adds a new employee, or updates the selected one
+void EmployeeDlg::OnOK()
+{
+	if (SelectedIndex() >= 0)
+	{
+		OnUpdate();
+	}
+	else
+	{
+		OnAdd();
+	}
 }

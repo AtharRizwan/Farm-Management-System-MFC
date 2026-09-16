@@ -1,4 +1,3 @@
-
 // Farm Management System MFC.cpp : Defines the class behaviors for the application.
 //
 
@@ -6,6 +5,9 @@
 #include "framework.h"
 #include "Farm Management System MFC.h"
 #include "Farm Management System MFCDlg.h"
+#include "HomePageDlg.h"
+#include "UiTheme.h"
+#include <stdexcept>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -15,7 +17,6 @@
 // CFarmManagementSystemMFCApp
 
 BEGIN_MESSAGE_MAP(CFarmManagementSystemMFCApp, CWinApp)
-	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
@@ -25,15 +26,34 @@ CFarmManagementSystemMFCApp::CFarmManagementSystemMFCApp()
 {
 	// support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
-
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
 }
 
 
 // The one and only CFarmManagementSystemMFCApp object
 
 CFarmManagementSystemMFCApp theApp;
+
+FarmData& GetFarm()
+{
+	return theApp.m_farm;
+}
+
+namespace
+{
+	// Shows a dialog as the app's main window. MFC posts WM_QUIT when the main
+	// window is destroyed; that message is removed so the next dialog can run.
+	INT_PTR RunMainDialog(CDialog& dlg)
+	{
+		AfxGetApp()->m_pMainWnd = &dlg;
+		INT_PTR result = dlg.DoModal();
+		AfxGetApp()->m_pMainWnd = nullptr;
+		MSG msg;
+		while (::PeekMessage(&msg, nullptr, WM_QUIT, WM_QUIT, PM_REMOVE))
+		{
+		}
+		return result;
+	}
+}
 
 
 // CFarmManagementSystemMFCApp initialization
@@ -45,55 +65,48 @@ BOOL CFarmManagementSystemMFCApp::InitInstance()
 	// visual styles.  Otherwise, any window creation will fail.
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
-	// Set this to include all the common control classes you want to use
-	// in your application.
-	InitCtrls.dwICC = ICC_WIN95_CLASSES;
+	InitCtrls.dwICC = ICC_WIN95_CLASSES | ICC_DATE_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
 
-
 	AfxEnableControlContainer();
-
-	// Create the shell manager, in case the dialog contains
-	// any shell tree view or shell list view controls.
-	CShellManager *pShellManager = new CShellManager;
 
 	// Activate "Windows Native" visual manager for enabling themes in MFC controls
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	// of your final executable, you should remove from the following
-	// the specific initialization routines you do not need
-	// Change the registry key under which our settings are stored
-	// TODO: You should modify this string to be something appropriate
-	// such as the name of your company or organization
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+	SetRegistryKey(_T("Farm Management System"));
 
-	CFarmManagementSystemMFCDlg dlg;
-	m_pMainWnd = &dlg;
-	INT_PTR nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
+	// The data files are opened by relative path, so a missing file usually
+	// means the app was started from the wrong folder. Missing files in data/
+	// are first copied from defaults/.
+	try
 	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with OK
+		m_farm.loadAll();
 	}
-	else if (nResponse == IDCANCEL)
+	catch (const std::exception& e)
 	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with Cancel
-	}
-	else if (nResponse == -1)
-	{
-		TRACE(traceAppMsg, 0, "Warning: dialog creation failed, so application is terminating unexpectedly.\n");
-		TRACE(traceAppMsg, 0, "Warning: if you are using MFC controls on the dialog, you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\n");
+		CString message;
+		message.Format(_T("The farm data could not be loaded.\n\n%s\n\n")
+			_T("If a file is missing, start the program from the folder that contains the \"defaults\" folder."),
+			(LPCTSTR)ToCString(e.what()));
+		AfxMessageBox(message, MB_ICONERROR);
+		return FALSE;
 	}
 
-	// Delete the shell manager created above.
-	if (pShellManager != nullptr)
+	// Show the login screen, then the home page. Logging out returns to the login screen.
+	for (;;)
 	{
-		delete pShellManager;
+		CFarmManagementSystemMFCDlg login;
+		if (RunMainDialog(login) != IDOK)
+		{
+			break;
+		}
+		HomePageDlg home;
+		if (RunMainDialog(home) != IDC_LOGOUT)
+		{
+			break;
+		}
 	}
 
 #if !defined(_AFXDLL) && !defined(_AFX_NO_MFC_CONTROLS_IN_DIALOGS)
@@ -104,4 +117,3 @@ BOOL CFarmManagementSystemMFCApp::InitInstance()
 	//  application, rather than start the application's message pump.
 	return FALSE;
 }
-

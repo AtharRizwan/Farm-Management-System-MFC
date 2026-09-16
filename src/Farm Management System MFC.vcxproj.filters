@@ -48,6 +48,15 @@
     <ClInclude Include="EmployeeDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FarmData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FieldLogDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UiTheme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Farm Management System MFC.cpp">
@@ -74,6 +83,15 @@
     <ClCompile Include="EmployeeDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FarmData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FieldLogDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UiTheme.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FarmManagementSystemMFC.rc">
@@ -83,9 +101,6 @@
   <ItemGroup>
     <None Include="res\FarmManagementSystemMFC.rc2">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="resource.hm">
-      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -5,104 +5,113 @@
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
-#define IDD_FARM_MANAGEMENT_SYSTEM_MFC_DIALOG 102
+#define IDD_LOGIN                       102
 #define IDR_MAINFRAME                   128
-#define IDD_DIALOG1                     130
-#define IDD_DIALOG2                     132
-#define IDD_DIALOG3                     140
-#define txtUsername                     1000
-#define txtPassword                     1001
-#define btnLogin                        1002
-#define btnCrops                        1007
-#define BtnAnimals                      1009
-#define BtnAnimals2                     1010
-#define IDC_EDIT1                       1011
-#define BtnAnimals3                     1011
-#define txtWheatType                    1011
-#define txtWheatFieldSize               1012
-#define txtWheatType2                   1013
-#define txtCornType                     1013
-#define txtWheatQuantity                1014
-#define txtWheatPrice                   1015
-#define txtWheatStatus                  1016
-#define txtWheatPDate                   1017
-#define txtWheatHDate                   1018
-#define txtWheatFieldSize2              1019
-#define txtCornFieldSize                1019
-#define txtHeadsYard                    1020
-#define txtHeadWeight                   1021
-#define txtWheatQuantity2               1022
-#define txtCornQuantity                 1022
-#define txtWheatPrice2                  1023
-#define txtCornPrice                    1023
-#define btnProcess                      1024
-#define btnAdvanceStatusWheat           1025
-#define dtpWheatPlanting                1026
-#define dtpWheatHarvesting              1027
-#define txtYieldWheat                   1028
-#define txtWheatStatus2                 1029
-#define txtCornStatus                   1029
-#define txtWheatHDate2                  1030
-#define txtCornHDate                    1030
-#define txtHeadsYard2                   1031
-#define txtEarWeight                    1031
-#define txtHeadWeight2                  1032
-#define txtShrinkage                    1032
-#define btnAdvanceStatusWheat2          1033
-#define btnAdvanceStatusCorn            1033
-#define dtpWheatPlanting2               1034
-#define dtpCornPlanting                 1034
-#define dtpWheatHarvesting2             1035
-#define dtpCornHarvesting               1035
-#define txtWheatPDate2                  1036
-#define txtCornPDate                    1036
-#define txtYieldWheat2                  1037
-#define txtYieldCorn                    1037
-#define txtEarsAcre                     1038
-#define txtKernalsEar                   1039
-#define IDC_BUTTON1                     1040
-#define txtStartNewSeason               1040
-#define btnEmployeeDlg                  1040
-#define btnAddEmployee                  1040
-#define txtRevenue                      1041
-#define btnAddEmployee2                 1041
-#define txtHarvestAndStore              1042
-#define txtSellAndGenerateRevenue       1043
-#define IDC_EDIT2                       1049
-#define txtAge                          1050
-#define IDC_EDIT4                       1051
-#define txtSalary                       1051
-#define listEmpData                     1054
-#define txtRiceType                     1055
-#define txtName                         1055
-#define txtRiceFieldSize                1056
-#define txtRiceQuantity                 1057
-#define txtRicePrice                    1058
-#define txtRiceStatus                   1059
-#define txtRiceHDate                    1060
-#define txtGrainWeight                  1061
-#define btnAdvanceStatusRice            1063
-#define dtpRicePlanting                 1064
-#define dtpRiceHarvesting               1065
-#define txtRicePDate                    1066
-#define txtYieldRice                    1067
-#define txtPaniclesM2                   1068
-#define txtGrainsPanicle                1069
-#define txtFertilizer                   1083
-#define txtWater                        1084
-#define txtFertilizerPrice              1085
-#define txtWaterPrice                   1086
-#define txtRice                         1089
-#define txtWheat                        1095
-#define txtCorn                         1096
+#define IDD_HOME                        130
+#define IDD_CROPS                       132
+#define IDD_EMPLOYEES                   140
+#define IDD_FIELDLOG                    142
+
+// Controls shared by all dialogs (styled by ThemedDialog)
+#define IDC_TITLE                       1000
+#define IDC_SUBTITLE                    1001
+#define IDC_ERROR                       1002
+
+// Login
+#define IDC_USERNAME                    1010
+#define IDC_PASSWORD                    1011
+
+// Home
+#define IDC_OPEN_CROPS                  1020
+#define IDC_OPEN_EMPLOYEES              1021
+#define IDC_SUMMARY                     1022
+#define IDC_LOGOUT                      1023
+
+// Crops: wheat
+#define IDC_WHEAT_VARIETY               1100
+#define IDC_WHEAT_FIELD_SIZE            1101
+#define IDC_WHEAT_QUANTITY              1102
+#define IDC_WHEAT_PRICE                 1103
+#define IDC_WHEAT_STATUS                1104
+#define IDC_WHEAT_ADVANCE               1105
+#define IDC_WHEAT_PLANTED               1106
+#define IDC_WHEAT_HARVESTED             1107
+#define IDC_WHEAT_YIELD                 1108
+#define IDC_WHEAT_FIELD_LOG             1109
+#define IDC_WHEAT_HEADS                 1110
+#define IDC_WHEAT_HEAD_WEIGHT           1111
+
+// Crops: corn
+#define IDC_CORN_VARIETY                1120
+#define IDC_CORN_FIELD_SIZE             1121
+#define IDC_CORN_QUANTITY               1122
+#define IDC_CORN_PRICE                  1123
+#define IDC_CORN_STATUS                 1124
+#define IDC_CORN_ADVANCE                1125
+#define IDC_CORN_PLANTED                1126
+#define IDC_CORN_HARVESTED              1127
+#define IDC_CORN_YIELD                  1128
+#define IDC_CORN_FIELD_LOG              1129
+#define IDC_CORN_EARS                   1130
+#define IDC_CORN_KERNELS                1131
+#define IDC_CORN_KERNEL_WEIGHT          1132
+#define IDC_CORN_SHRINKAGE              1133
+
+// Crops: rice
+#define IDC_RICE_VARIETY                1140
+#define IDC_RICE_FIELD_SIZE             1141
+#define IDC_RICE_QUANTITY               1142
+#define IDC_RICE_PRICE                  1143
+#define IDC_RICE_STATUS                 1144
+#define IDC_RICE_ADVANCE                1145
+#define IDC_RICE_PLANTED                1146
+#define IDC_RICE_HARVESTED              1147
+#define IDC_RICE_YIELD                  1148
+#define IDC_RICE_FIELD_LOG              1149
+#define IDC_RICE_PANICLES               1150
+#define IDC_RICE_GRAINS                 1151
+#define IDC_RICE_GRAIN_WEIGHT           1152
+
+// Crops: storage and sales
+#define IDC_FERTILIZER                  1160
+#define IDC_WATER                       1161
+#define IDC_FERTILIZER_PRICE            1162
+#define IDC_WATER_PRICE                 1163
+#define IDC_STORED_WHEAT                1164
+#define IDC_STORED_CORN                 1165
+#define IDC_STORED_RICE                 1166
+#define IDC_REVENUE                     1167
+#define IDC_HARVEST                     1168
+#define IDC_SELL                        1169
+#define IDC_NEW_SEASON                  1170
+
+// Employees
+#define IDC_EMPLOYEE_LIST               1200
+#define IDC_EMP_NAME                    1201
+#define IDC_EMP_AGE                     1202
+#define IDC_EMP_SALARY                  1203
+#define IDC_EMP_ADD                     1204
+#define IDC_EMP_UPDATE                  1205
+#define IDC_EMP_REMOVE                  1206
+#define IDC_EMP_CLEAR                   1207
+
+// Field log
+#define IDC_LOG_ACTION                  1300
+#define IDC_LOG_DATE                    1301
+#define IDC_LOG_AMOUNT                  1302
+#define IDC_LOG_UNIT                    1303
+#define IDC_LOG_DESCRIPTION             1304
+#define IDC_LOG_STOCK                   1305
+#define IDC_LOG_AMOUNT_LABEL            1306
+#define IDC_LOG_DESCRIPTION_LABEL       1307
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1056
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_CONTROL_VALUE         1400
+#define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

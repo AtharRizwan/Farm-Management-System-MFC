@@ -6,31 +6,21 @@
 class Employee {
 private:
     std::string name;
-    int age;
-    double salary;
-    bool retired;
-    bool hired;
-    Employee* manager;
+    int age = 0;
+    double salary = 0;
 
 public:
-    Employee(std::string name, int age, double salary);
+    // Throws std::invalid_argument if a value is not allowed
+    Employee(const std::string& name, int age, double salary);
 
-    void setName(std::string name);
+    void setName(const std::string& name);
     void setAge(int age);
     void setSalary(double salary);
-    std::string getName();
-    int getAge();
-    double getSalary();
-    void print();
+    const std::string& getName() const;
+    int getAge() const;
+    double getSalary() const;
     void promote(double amount);
     void demote(double amount);
-    void retire();
-    void hire();
-    bool isRetired();
-    bool isHired();
-    void setManager(Employee* manager);
-    Employee* getManager();
 };
 
 #endif // EMPLOYEE_H
-

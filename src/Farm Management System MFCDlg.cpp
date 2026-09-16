@@ -1,4 +1,3 @@
-
 // Farm Management System MFCDlg.cpp : implementation file
 //
 
@@ -7,76 +6,45 @@
 #include "Farm Management System MFC.h"
 #include "Farm Management System MFCDlg.h"
 #include "afxdialogex.h"
-#include "HomePageDlg.h"
-#include <ctime>
-#include <string>
-#include "Crop.h"
-
-
-using namespace std;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+namespace
+{
+	// The app has a single built-in account
+	const LPCTSTR kUsername = _T("admin");
+	const LPCTSTR kPassword = _T("admin");
+}
+
 
 // CAboutDlg dialog used for App About
 
-class CAboutDlg : public CDialogEx
+class CAboutDlg : public ThemedDialog
 {
 public:
-	CAboutDlg();
+	CAboutDlg() : ThemedDialog(IDD_ABOUTBOX, nullptr) {}
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
 };
-
-CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
 
 
 // CFarmManagementSystemMFCDlg dialog
 
-
-
 CFarmManagementSystemMFCDlg::CFarmManagementSystemMFCDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_FARM_MANAGEMENT_SYSTEM_MFC_DIALOG, pParent)
+	: ThemedDialog(IDD_LOGIN, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CFarmManagementSystemMFCDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CFarmManagementSystemMFCDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CFarmManagementSystemMFCDlg, ThemedDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDOK, &CFarmManagementSystemMFCDlg::OnBnClickedOk)
-	ON_EN_CHANGE(txtUsername, &CFarmManagementSystemMFCDlg::OnEnChangetxtusername)
-	ON_BN_CLICKED(IDCANCEL, &CFarmManagementSystemMFCDlg::OnBnClickedCancel)
-	ON_BN_CLICKED(btnLogin, &CFarmManagementSystemMFCDlg::OnBnClickedbtnlogin)
-	ON_EN_CHANGE(txtPassword, &CFarmManagementSystemMFCDlg::OnEnChangetxtpassword)
 END_MESSAGE_MAP()
 
 
@@ -84,7 +52,7 @@ END_MESSAGE_MAP()
 
 BOOL CFarmManagementSystemMFCDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	ThemedDialog::OnInitDialog();
 
 	// Add "About..." menu item to system menu.
 
@@ -95,11 +63,8 @@ BOOL CFarmManagementSystemMFCDlg::OnInitDialog()
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != nullptr)
 	{
-		BOOL bNameValid;
 		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
+		if (strAboutMenu.LoadString(IDS_ABOUTBOX) && !strAboutMenu.IsEmpty())
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
 			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
@@ -111,9 +76,10 @@ BOOL CFarmManagementSystemMFCDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	// TODO: Add extra initialization here
-
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	SendDlgItemMessage(IDC_USERNAME, EM_SETLIMITTEXT, 64);
+	SendDlgItemMessage(IDC_PASSWORD, EM_SETLIMITTEXT, 64);
+	GotoDlgCtrl(GetDlgItem(IDC_USERNAME));
+	return FALSE;  // focus was set to a control
 }
 
 void CFarmManagementSystemMFCDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -125,7 +91,7 @@ void CFarmManagementSystemMFCDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else
 	{
-		CDialogEx::OnSysCommand(nID, lParam);
+		ThemedDialog::OnSysCommand(nID, lParam);
 	}
 }
 
@@ -135,28 +101,17 @@ void CFarmManagementSystemMFCDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CFarmManagementSystemMFCDlg::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
-	CRect rect;
-	GetClientRect(&rect);
-	int r, g, b;
-	r = 104;
-	g = 166;
-	b = 145;
-
-	CBrush myb;
-	myb.CreateSolidBrush(RGB(r, g, b));
-	dc.FillRect(&rect, &myb);
-
 	if (IsIconic())
 	{
-
+		CPaintDC dc(this); // device context for painting
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
 		// Center icon in client rectangle
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
-
+		CRect rect;
+		GetClientRect(&rect);
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
@@ -165,7 +120,7 @@ void CFarmManagementSystemMFCDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		ThemedDialog::OnPaint();
 	}
 }
 
@@ -176,82 +131,27 @@ HCURSOR CFarmManagementSystemMFCDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
-void CFarmManagementSystemMFCDlg::OnEnChangeEdit1()
+// Sign In button and the Enter key
+void CFarmManagementSystemMFCDlg::OnOK()
 {
-	// TODO:  If this is a RICHEDIT control, the control will not
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-	// TODO:  Add your control notification handler code here
-}
-
-
-void CFarmManagementSystemMFCDlg::OnBnClickedOk()
-{
-	// TODO: Add your control notification handler code here
-	CDialogEx::OnOK();
-}
-
-
-void CFarmManagementSystemMFCDlg::OnEnChangePassword()
-{
-	// TODO:  If this is a RICHEDIT control, the control will not
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-	// TODO:  Add your control notification handler code here
-}
-
-
-void CFarmManagementSystemMFCDlg::OnEnChangetxtusername()
-{
-	// TODO:  If this is a RICHEDIT control, the control will not
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-	// TODO:  Add your control notification handler code here
-}
-
-
-void CFarmManagementSystemMFCDlg::OnBnClickedCancel()
-{
-	// TODO: Add your control notification handler code here
-	CDialogEx::OnCancel();
-}
-
-
-void CFarmManagementSystemMFCDlg::OnBnClickedbtnlogin()
-{
-	// TODO: Add your control notification handler code here
 	CString username;
 	CString password;
-	GetDlgItemText(txtUsername, username);
-	GetDlgItemText(txtPassword, password);
-	if (username == "admin" && password == "admin")
+	GetDlgItemText(IDC_USERNAME, username);
+	GetDlgItemText(IDC_PASSWORD, password);
+	username.Trim();
+
+	if (username.IsEmpty() || password.IsEmpty())
 	{
-		CDialogEx::OnCancel();
-		AfxMessageBox(L"Login Successful!");
-		HomePageDlg dlg;
-		dlg.DoModal();
+		ShowError(_T("Enter your username and password."));
+		GotoDlgCtrl(GetDlgItem(username.IsEmpty() ? IDC_USERNAME : IDC_PASSWORD));
+		return;
 	}
-	else
+	if (username != kUsername || password != kPassword)
 	{
-		AfxMessageBox(L"Login Unsuccessful!");
+		ShowError(_T("Incorrect username or password."));
+		SetDlgItemText(IDC_PASSWORD, _T(""));
+		GotoDlgCtrl(GetDlgItem(IDC_PASSWORD));
+		return;
 	}
-}
-
-
-void CFarmManagementSystemMFCDlg::OnEnChangetxtpassword()
-{
-	// TODO:  If this is a RICHEDIT control, the control will not
-	// send this notification unless you override the CDialogEx::OnInitDialog()
-	// function and call CRichEditCtrl().SetEventMask()
-	// with the ENM_CHANGE flag ORed into the mask.
-
-	// TODO:  Add your control notification handler code here
+	ThemedDialog::OnOK();
 }

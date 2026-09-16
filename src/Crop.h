@@ -3,183 +3,179 @@
 #define CROP_H
 
 #include <string>
+#include <vector>
+
+class Harvest;
+
+// Text used for a date that has not been set
+extern const char* const kDateNotSet;
+
+// Returns today's date as M/D/YYYY
+std::string todayString();
 
 // Crop Class
 class Crop
 {
 	// Friend declaration
 	friend class Harvest;
-	// Private data members
 protected:
 	std::string name;
-	int fieldSize;	// in acres
-	static double quantity;	// in tonnes
-	static double price;	// in Rs. per tonne
-	std::string plantingDate;
-	std::string harvestingDate;
+	std::string variety;
+	int fieldSize = 0;	// in acres
+	double quantity = 0;	// in tonnes
+	double price = 0;	// in Rs. per tonne
+	std::string plantingDate = kDateNotSet;
+	std::string harvestingDate = kDateNotSet;
 	std::string growthStatus;
-	// Public member functions
+
+	// Read and write the fields shared by all crops, in file order
+	void loadCommon(std::istream& in, const std::string& path, int& line);
+	void saveCommon(std::ostream& out) const;
+	// Path of the crop's data file
+	std::string dataFile() const;
+
 public:
 	// Constructor
-	Crop();
+	explicit Crop(std::string name);
+	virtual ~Crop() = default;
+
+	// Growth statuses in order, from "Not Planted" to "Maturity".
+	// A harvested crop has the status "Harvested" until a new season starts.
+	static const std::vector<std::string>& statuses();
 
 	// Setter functions
-	void setName(std::string name);
-	static void setQuantity(double quantity);
-	static void setPrice(double price);
-	void setPlantingDate(std::string plantingDate);
-	void setHarvestingDate(std::string harvestingDate);
+	void setVariety(const std::string& variety);
+	void setQuantity(double quantity);
+	void setPrice(double price);
+	void setPlantingDate(const std::string& plantingDate);
+	void setHarvestingDate(const std::string& harvestingDate);
 	void setFieldSize(int fieldSize);
 
 	// Getter Functions
-	std::string getName() const; 
+	const std::string& getName() const;
+	const std::string& getVariety() const;
 	double getQuantity() const;
 	double getPrice() const;
-	std::string getPlantingDate() const;
-	std::string getHarvestingDate() const;
+	const std::string& getPlantingDate() const;
+	const std::string& getHarvestingDate() const;
 	int getFieldSize() const;
-	std::string getGrowthStatus() const;
+	const std::string& getGrowthStatus() const;
+	bool isMature() const;
+	bool isHarvested() const;
 
+	// Moves the crop to its next growth status.
+	// Returns false if the crop has already matured.
+	bool advanceStatus();
 
-	// Function to advance the growth status
-	// The growth statuses in order are
-	// Germination, Seedling, Vegetative,
-	// Flowering, Filling, Maturity
-	void advanceStatus();
-
-	// Function to update quantity i.e. add or remove
-	void updateQuantity(double amount);
-
-	// Function to update price i.e. add or remove
-	void updatePrice(double amount);
+	// Tonnes that a harvest would collect: the entered quantity,
+	// or the estimated yield for the whole field if none was entered
+	double harvestableQuantity() const;
 
 	// Calculates and returns revenue
 	double calculateRevenue() const;
 
-	// Get Crop Yield after harvest
-	double getTotalYield() const;
-
-	// Calculates and returns Yield in tonnes per acre
-	// The yeild of each crop is calculated differently
+	// Calculates and returns the estimated yield in tonnes per acre.
+	// The yield of each crop is calculated differently.
 	virtual double calculateYield() const = 0;
 
 	// record any pest infestations
-	void recordPestInfestation(std::string date, std::string description);
+	void recordPestInfestation(const std::string& date, const std::string& description) const;
 
 	// record any disease outbreaks
-	void recordDiseaseOutbreak(std::string date, std::string description);
+	void recordDiseaseOutbreak(const std::string& date, const std::string& description) const;
 
-	// Water crop and record it
-	void recordCropWatering(std::string date, double water);
+	// Water crop from the storage and record it
+	void recordCropWatering(Harvest& storage, const std::string& date, double water) const;
 
-	// Function to fertilize crop and record it
-	void recordFertilization(std::string date, double fertilizer);
+	// Fertilize crop from the storage and record it
+	void recordFertilization(Harvest& storage, const std::string& date, double fertilizer) const;
 
 	// Function to reset the Crop for new season
-	void virtual startNewSeason();
+	virtual void startNewSeason();
+
+	// Load from and save to the crop's file in data/.
+	// Both throw std::runtime_error on failure.
+	virtual void load() = 0;
+	virtual void save() const = 0;
 };
 
 
 // Derived class wheat
-class Wheat : public Crop 
+class Wheat : public Crop
 {
-	std::string wheatType;
-	int headsPerYard;
-	double headWeight;	// in grams
+	int headsPerYard = 0;	// heads per square yard
+	double headWeight = 0;	// in grams
 public:
-	// Constructor
 	Wheat();
 
 	// setter functions
-	void setWheatType(std::string wheatType);
 	void setHeadsPerYard(int headsPerYard);
 	void setHeadWeight(double headWeight);
 
 	// Getter functions
-	std::string getWheatType() const;
 	int getHeadsPerYard() const;
 	double getHeadWeight() const;
 
-	// function to calculate yield in tonnes per acres
 	double calculateYield() const override;
-
-	// Overridden function of startNewSeason
 	void startNewSeason() override;
-
-	// Destructor for saving data
-	~Wheat();
+	void load() override;
+	void save() const override;
 };
 
 
 // Derived class Corn
 class Corn : public Crop
-{	
-	std::string cornType;
-	int earsPerAcre;
-	int kernalsPerEar;
-	double earWeight;	//in grams
-	int shrinkage;
+{
+	int earsPerAcre = 0;
+	int kernelsPerEar = 0;
+	double kernelWeight = 0;	// in grams
+	int shrinkage = 0;	// in percent
 public:
-	// Constructor
 	Corn();
 
 	// Setter functions
-	void setCornType(std::string cornType);
 	void setEarsPerAcre(int earsPerAcre);
-	void setKernalsPerEar(int kernalsPerEar);
-	void setEarWeight(double earWeight);
-	void setShrinkage(int shrikage);
+	void setKernelsPerEar(int kernelsPerEar);
+	void setKernelWeight(double kernelWeight);
+	void setShrinkage(int shrinkage);
 
 	// Getter functions
-	std::string getCornType() const;
 	int getEarsPerAcre() const;
-	int getKernalsPerEar() const;
-	double getEarWeight() const;
+	int getKernelsPerEar() const;
+	double getKernelWeight() const;
 	int getShrinkage() const;
 
-	// Function to calculate yield
 	double calculateYield() const override;
-
-	// Overridden function of startNewSeason
 	void startNewSeason() override;
-
-	// Destructor for saving data
-	~Corn();
+	void load() override;
+	void save() const override;
 };
 
 
 // Derived class Rice
 class Rice : public Crop
 {
-	std::string riceType;
-	int numPaniclesPerM2;
-	int grainsPerPanicle;
-	double grainWeight;	//in grams
+	int numPaniclesPerM2 = 0;
+	int grainsPerPanicle = 0;
+	double grainWeight = 0;	// in grams
 
 public:
-	// Constructor
 	Rice();
 
 	// setter functions
-	void setRiceType(std::string riceType);
 	void setNumPaniclesPerM2(int numPaniclesPerM2);
 	void setGrainsPerPanicle(int grainsPerPanicle);
 	void setGrainWeight(double grainWeight);
 
 	// Getter functions
-	std::string getRiceType() const;
 	int getNumPaniclesPerM2() const;
 	int getGrainsPerPanicle() const;
 	double getGrainWeight() const;
 
-	// Function to calculate yield in tonnes per acre
 	double calculateYield() const override;
-
-	// Overridden function of startNewSeason
 	void startNewSeason() override;
-
-	// Destructor for saving data
-	~Rice();
+	void load() override;
+	void save() const override;
 };
 
 class Harvest {
@@ -188,32 +184,25 @@ private:
 	friend Crop;
 
 	// data members
-	static double fertilizer;	// in kg
-	static double water;	// in litres
-	double priceFertilizer;	// in Rs per kg
-	double priceWater;	// in Rs per litres
-	double amountRice;	// in tonnes
-	double amountWheat;	// in tonnes
-	double amountCorn;	// in tonnes
-	double revenue;	// in Rs.
+	double fertilizer = 0;	// in kg
+	double water = 0;	// in litres
+	double priceFertilizer = 0;	// in Rs per kg
+	double priceWater = 0;	// in Rs per litres
+	double amountRice = 0;	// in tonnes
+	double amountWheat = 0;	// in tonnes
+	double amountCorn = 0;	// in tonnes
+	double revenue = 0;	// in Rs.
 
 public:
-	// Constructor to load data
-	Harvest();
-
 	// setter functions
-	static void setFertilizer(double amount);
-	static void setWater(double amount);
+	void setFertilizer(double amount);
+	void setWater(double amount);
 	void setPriceFertilizer(double price);
 	void setPriceWater(double price);
-	void setAmountRice(double value);
-	void setAmountWheat(double value);
-	void setAmountCorn(double value);
-	void setRevenue(double value);
 
 	// Getter functions
-	static double getFertilizer();
-	static double getWater();
+	double getFertilizer() const;
+	double getWater() const;
 	double getPriceFertilizer() const;
 	double getPriceWater() const;
 	double getAmountRice() const;
@@ -221,20 +210,18 @@ public:
 	double getAmountCorn() const;
 	double getRevenue() const;
 
-	// Function to update amount of water
-	void updateWater(double amount);
+	// Harvests the crops that have reached maturity and stores them.
+	// Returns the names of the harvested crops.
+	std::vector<std::string> harvestAndStore(Wheat& wheat, Corn& corn, Rice& rice);
 
-	// Function to update amount of fertilizer
-	void updateFertilizer(double amount);
+	// Sells all stored crops at each crop's price.
+	// Returns the money earned.
+	double sellAndGenerateRevenue(const Wheat& wheat, const Corn& corn, const Rice& rice);
 
-	// Function to store the harvested crop
-	void harvestAndStore();
-
-	//Function to sell all harvested crops and return the revenue
-	void SellAndGenerateRevenue();
-
-	// Desrtructor to save data
-	~Harvest();
+	// Load from and save to data/Harvest.txt.
+	// Both throw std::runtime_error on failure.
+	void load();
+	void save() const;
 };
 
 

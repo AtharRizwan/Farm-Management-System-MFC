@@ -1,77 +1,49 @@
 #include "pch.h"
+#include <cmath>
+#include <stdexcept>
 #include <string>
-#include <iostream>
 #include "employee.h"
 
-Employee::Employee(std::string name, int age, double salary) {
-    this->name = name;
+Employee::Employee(const std::string& name, int age, double salary) {
+    setName(name);
     setAge(age);
     setSalary(salary);
-    this->retired = false;
-    this->hired = false;
-    this->manager = nullptr;
 }
 
-void Employee::setName(std::string name) 
-{ 
-    this->name = name; 
-}
-
-void Employee::setAge(int age) 
+void Employee::setName(const std::string& name)
 {
-    if (age <= 0)
+    size_t first = name.find_first_not_of(" \t");
+    if (first == std::string::npos)
     {
-        throw "Illegal Argument";
+        throw std::invalid_argument("Name cannot be empty");
     }
-    this->age = age; 
+    this->name = name.substr(first, name.find_last_not_of(" \t") - first + 1);
 }
 
-void Employee::setSalary(double salary) 
-{ 
-    if (salary < 0)
+void Employee::setAge(int age)
+{
+    if (age < 14 || age > 100)
     {
-        throw "Illegal Argument";
+        throw std::invalid_argument("Age must be between 14 and 100");
     }
-    this->salary = salary; 
+    this->age = age;
 }
 
-std::string Employee::getName() { return this->name; }
-
-int Employee::getAge() { return this->age; }
-
-double Employee::getSalary() { return this->salary; }
-
-void Employee::print() {
-    std::cout << "Name: " << this->name << std::endl;
-    std::cout << "Age: " << this->age << std::endl;
-    std::cout << "Salary: " << this->salary << std::endl;
-    std::cout << "Manager: "
-        << ((this->manager != nullptr) ? this->manager->getName() : "None")
-        << std::endl;
-    std::cout << "Status: "
-        << ((this->retired) ? "Retired"
-            : ((this->hired) ? "Hired" : "Unemployed"))
-        << std::endl;
+void Employee::setSalary(double salary)
+{
+    if (salary < 0 || !std::isfinite(salary))
+    {
+        throw std::invalid_argument("Salary cannot be negative");
+    }
+    this->salary = salary;
 }
 
-void Employee::promote(double amount) { this->salary += amount; }
+const std::string& Employee::getName() const { return name; }
 
-void Employee::demote(double amount) { this->salary -= amount; }
+int Employee::getAge() const { return age; }
 
-void Employee::retire() {
-    this->retired = true;
-    this->hired = false;
-}
+double Employee::getSalary() const { return salary; }
 
-void Employee::hire() {
-    this->hired = true;
-    this->retired = false;
-}
+void Employee::promote(double amount) { setSalary(salary + amount); }
 
-bool Employee::isRetired() { return this->retired; }
-
-bool Employee::isHired() { return this->hired; }
-
-void Employee::setManager(Employee* manager) { this->manager = manager; }
-
-Employee* Employee::getManager() { return this->manager; }
+void Employee::demote(double amount) { setSalary(salary - amount); }
